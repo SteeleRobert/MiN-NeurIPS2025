@@ -30,6 +30,25 @@ The core dependencies are as follows:
 4. **scikit-learn**
 5. **scipy**
 
+### Using uv (recommended)
+A `pyproject.toml` is provided for reproducible setup with [uv](https://github.com/astral-sh/uv). The default configuration targets `torch==2.0.0+cu118` with Python 3.11.
+
+```bash
+# Install uv if needed
+curl -LsSf https://astral.sh/uv/install.sh | sh
+
+# Create environment and install all dependencies
+uv sync
+
+# Activate the environment
+source .venv/bin/activate
+```
+
+Alternatively, run commands directly without activating:
+```bash
+uv run python MiN/main.py ...
+```
+
 ## How to run?
 Use the script "run.sh" to reproduce the restlts of 10 steps setting:
 

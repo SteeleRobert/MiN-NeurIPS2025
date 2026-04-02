@@ -1,0 +1,21 @@
+[project]
+name = "min-neurips2025"
+version = "0.1.0"
+description = "Mixture of Noise for Pre-Trained Model-Based Class-Incremental Learning"
+requires-python = ">=3.10"
+dependencies = [
+    "torch==2.0.0",
+    "torchvision==0.15.1",
+    "timm",
+    "scikit-learn",
+    "scipy",
+]
+
+[[tool.uv.index]]
+name = "pytorch-cu118"
+url = "https://download.pytorch.org/whl/cu118"
+explicit = true
+
+[tool.uv.sources]
+torch = [{ index = "pytorch-cu118" }]
+torchvision = [{ index = "pytorch-cu118" }]

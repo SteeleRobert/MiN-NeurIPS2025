@@ -1,0 +1,10 @@
+{
+    "dataset": "cub",
+    "init_class": 10,
+    "increment": 10,
+    "img_size": 224,
+    "save_all_checkpoint": false,
+    "shuffle": true,
+    "seed": 1993,
+    "data_root": "/home/jessicaz/qz-compcont-learning/data"
+}

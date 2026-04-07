@@ -71,6 +71,7 @@ class MinNet(object):
         print('total acc: {}'.format(self.total_acc))
         print('avg_acc: {:.2f}'.format(np.mean(self.total_acc)))
         del test_set
+        return eval_res
 
     def save_check_point(self, path_name):
         torch.save(self._network.state_dict(), path_name)

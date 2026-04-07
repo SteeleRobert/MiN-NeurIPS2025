@@ -9,6 +9,8 @@ dependencies = [
     "timm",
     "scikit-learn",
     "scipy",
+    "einops>=0.8.2",
+    "numpy<2",
 ]
 
 [[tool.uv.index]]

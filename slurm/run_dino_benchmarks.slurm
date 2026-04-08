@@ -14,6 +14,8 @@
 #   REPO_ROOT     — repo path (default: directory from which sbatch was run)
 #   DATA_ROOT     — datasets (default: $HOME/qz-compcont-learning/data)
 #   LOG_DIR       — benchmark logs (default: $HOME/min_benchmark_logs/<BACKBONE>)
+# Slack on completion (optional): export SLACK_WEBHOOK_URL=... or create
+#   slurm/.slack_webhook_url (see slurm/slack_notify.sh).
 #
 # Uncomment and set if your site requires:
 ##SBATCH --account=<YOUR_ACCOUNT>
@@ -70,6 +72,19 @@ echo "LOG_DIR=$LOG_DIR"
 echo "CUDA_VISIBLE_DEVICES=${CUDA_VISIBLE_DEVICES:-unset}"
 echo "==========================="
 
-bash ./run_benchmarks.sh
+# shellcheck source=slack_notify.sh
+source "$REPO_ROOT/slurm/slack_notify.sh"
 
-echo "=== Finished: $(date -Is) ==="
+set +e
+bash ./run_benchmarks.sh
+bench_rc=$?
+set -euo pipefail
+
+echo "=== Finished: $(date -Is) (exit $bench_rc) ==="
+
+if [[ $bench_rc -eq 0 ]]; then
+    min_slack_notify "finished OK"
+else
+    min_slack_notify "FAILED (exit ${bench_rc})"
+    exit "$bench_rc"
+fi

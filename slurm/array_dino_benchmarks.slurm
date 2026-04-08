@@ -9,6 +9,8 @@
 # Concurrency: %1 runs one backbone at a time (one 2-GPU node). Change to %2 to run
 # both array tasks in parallel on two nodes (if your allocation allows).
 #
+# Slack on completion (optional): export SLACK_WEBHOOK_URL=... or slurm/.slack_webhook_url
+#
 # Uncomment if required:
 ##SBATCH --account=<YOUR_ACCOUNT>
 ##SBATCH --qos=<YOUR_QOS>
@@ -51,5 +53,20 @@ export LOG_DIR="${LOG_DIR:-$HOME/min_benchmark_logs/${BACKBONE}}"
 echo "=== MiN DINO benchmarks [array task $SLURM_ARRAY_TASK_ID] ==="
 echo "BACKBONE=$BACKBONE"
 echo "Start: $(date -Is)"
+
+# shellcheck source=slack_notify.sh
+source "$REPO_ROOT/slurm/slack_notify.sh"
+
+set +e
 bash ./run_benchmarks.sh
-echo "=== Finished: $(date -Is) ==="
+bench_rc=$?
+set -euo pipefail
+
+echo "=== Finished: $(date -Is) (exit $bench_rc) ==="
+
+if [[ $bench_rc -eq 0 ]]; then
+    min_slack_notify "finished OK"
+else
+    min_slack_notify "FAILED (exit ${bench_rc})"
+    exit "$bench_rc"
+fi

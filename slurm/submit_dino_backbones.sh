@@ -7,6 +7,8 @@
 # Optional:
 #   SLURM_EXTRA="--partition=gpu4_short --time=12:00:00" ./slurm/submit_dino_backbones.sh
 #   (override partition/time — edit run_dino_benchmarks.slurm if you prefer defaults)
+# Slack: put the webhook in slurm/.slack_webhook_url or export SLACK_WEBHOOK_URL before sbatch
+#   (sbatch --export=ALL,... passes env; see slurm/slack_notify.sh).
 
 set -euo pipefail
 

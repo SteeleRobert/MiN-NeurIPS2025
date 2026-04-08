@@ -25,6 +25,28 @@ GPU1="${GPU1:-1}"
 LOG_DIR="${LOG_DIR:-$HOME/min_benchmark_logs}"
 CONFIGS="MiN/configs"
 
+# Backbone to use.  Supported values:
+#   pretrained_vit_b16_224_in21k_min  (default — original MiN backbone)
+#   dinov2_vitb14                     (DINOv2 ViT-B/14, auto-downloaded via torch.hub)
+#   dinov3_vitb16                     (DINOv3 ViT-B/16, requires HF auth)
+BACKBONE="${BACKBONE:-pretrained_vit_b16_224_in21k_min}"
+
+# Map backbone name → model-config filename suffix
+case "$BACKBONE" in
+    pretrained_vit_b16_224_in21k_min) BSUFFIX="" ;;
+    dinov2_vitb14) BSUFFIX="-dinov2vitb14" ;;
+    dinov3_vitb16) BSUFFIX="-dinov3vitb16" ;;
+    *) echo "Unknown BACKBONE='$BACKBONE'. Supported: pretrained_vit_b16_224_in21k_min | dinov2_vitb14 | dinov3_vitb16"; exit 1 ;;
+esac
+
+echo "Backbone: $BACKBONE (config suffix: '${BSUFFIX:-none}')"
+
+# Short backbone tag appended to log filenames to avoid collisions across runs
+case "$BACKBONE" in
+    pretrained_vit_b16_224_in21k_min) BTAG="" ;;
+    *) BTAG="_${BACKBONE}" ;;
+esac
+
 mkdir -p "$LOG_DIR"
 
 cd "$(dirname "$0")"
@@ -85,48 +107,48 @@ run() {
 # ── Batch 1 ──────────────────────────────────────────────────────────────────
 
 # ImageNet-R B0-Inc10 (20T, EASE protocol)  -- GPU 0
-if data_ok "imagenetr_ease_20T" "$DATA_ROOT/imagenet-r-split/train" "$DATA_ROOT/imagenet-r-split/test"; then
-    run imagenetr_ease MiN-inr-10steps "$GPU0" "imagenetr_ease_20T" &
+if data_ok "imagenetr_ease_20T${BTAG}" "$DATA_ROOT/imagenet-r-split/train" "$DATA_ROOT/imagenet-r-split/test"; then
+    run imagenetr_ease "MiN-inr-10steps${BSUFFIX}" "$GPU0" "imagenetr_ease_20T${BTAG}" &
 fi
 
 # CIFAR-100 B0-Inc5 (20T, EASE protocol)    -- GPU 1  (auto-downloads, always run)
-run cifar_ease MiN-cifar-10steps "$GPU1" "cifar100_ease_20T" &
+run cifar_ease "MiN-cifar-10steps${BSUFFIX}" "$GPU1" "cifar100_ease_20T${BTAG}" &
 
-wait
+wait || true
 
 # ── Batch 2 ──────────────────────────────────────────────────────────────────
 
 # ImageNet-A B0-Inc20 (10T, EASE protocol)  -- GPU 0
-if data_ok "imageneta_ease_10T" "$DATA_ROOT/imagenet-a-split/train" "$DATA_ROOT/imagenet-a-split/test"; then
-    run imageneta_ease MiN-imageneta "$GPU0" "imageneta_ease_10T" &
+if data_ok "imageneta_ease_10T${BTAG}" "$DATA_ROOT/imagenet-a-split/train" "$DATA_ROOT/imagenet-a-split/test"; then
+    run imageneta_ease "MiN-imageneta${BSUFFIX}" "$GPU0" "imageneta_ease_10T${BTAG}" &
 fi
 
 # CUB-200 B0-Inc10 (20T, EASE protocol)     -- GPU 1
-if data_ok "cub200_ease_20T" "$DATA_ROOT/cub/train" "$DATA_ROOT/cub/test"; then
-    run cub_ease MiN-cub-10steps "$GPU1" "cub200_ease_20T" &
+if data_ok "cub200_ease_20T${BTAG}" "$DATA_ROOT/cub/train" "$DATA_ROOT/cub/test"; then
+    run cub_ease "MiN-cub-10steps${BSUFFIX}" "$GPU1" "cub200_ease_20T${BTAG}" &
 fi
 
-wait
+wait || true
 
 # ── Batch 3 ──────────────────────────────────────────────────────────────────
 
 # OmniBenchmark B0-Inc30 (10T, EASE protocol) -- GPU 0
-if data_ok "omnibenchmark_ease_10T" "$DATA_ROOT/omnibenchmark/train" "$DATA_ROOT/omnibenchmark/test"; then
-    run omnibenchmark_ease MiN-omni-10steps "$GPU0" "omnibenchmark_ease_10T" &
+if data_ok "omnibenchmark_ease_10T${BTAG}" "$DATA_ROOT/omnibenchmark/train" "$DATA_ROOT/omnibenchmark/test"; then
+    run omnibenchmark_ease "MiN-omni-10steps${BSUFFIX}" "$GPU0" "omnibenchmark_ease_10T${BTAG}" &
 fi
 
 # VTAB B0-Inc10 (5T, EASE protocol)           -- GPU 1
-if data_ok "vtab_ease_5T" "$DATA_ROOT/vtab/train" "$DATA_ROOT/vtab/test"; then
-    run vtab_ease MiN-vtab-5steps "$GPU1" "vtab_ease_5T" &
+if data_ok "vtab_ease_5T${BTAG}" "$DATA_ROOT/vtab/train" "$DATA_ROOT/vtab/test"; then
+    run vtab_ease "MiN-vtab-5steps${BSUFFIX}" "$GPU1" "vtab_ease_5T${BTAG}" &
 fi
 
-wait
+wait || true
 
 # ── Batch 4 ──────────────────────────────────────────────────────────────────
 
 # ObjectNet B0-Inc10 (20T, EASE protocol)     -- GPU 0
-if data_ok "objectnet_ease_20T" "$DATA_ROOT/objectnet/train" "$DATA_ROOT/objectnet/test"; then
-    run objectnet_ease MiN-inr-10steps "$GPU0" "objectnet_ease_20T"
+if data_ok "objectnet_ease_20T${BTAG}" "$DATA_ROOT/objectnet/train" "$DATA_ROOT/objectnet/test"; then
+    run objectnet_ease "MiN-inr-10steps${BSUFFIX}" "$GPU0" "objectnet_ease_20T${BTAG}"
 fi
 
 echo ""

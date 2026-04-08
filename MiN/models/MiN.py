@@ -129,6 +129,7 @@ class MinNet(object):
                                   num_workers=self.num_workers)
         test_loader = DataLoader(test_set, batch_size=self.buffer_batch, shuffle=False,
                                  num_workers=self.num_workers)
+        torch.cuda.empty_cache()
         self.fit_fc(train_loader, test_loader)
 
         train_set = data_manger.get_task_data(source="train_no_aug", class_list=train_list)
@@ -142,6 +143,7 @@ class MinNet(object):
             for param in self._network.backbone.parameters():
                 param.requires_grad = False
 
+        torch.cuda.empty_cache()
         self.re_fit(train_loader, test_loader)
 
         del train_set
@@ -169,6 +171,7 @@ class MinNet(object):
             for param in self._network.backbone.parameters():
                 param.requires_grad = False
 
+        torch.cuda.empty_cache()
         self.fit_fc(train_loader, test_loader)
 
         self._network.update_fc(self.increment)
@@ -196,6 +199,7 @@ class MinNet(object):
             for param in self._network.backbone.parameters():
                 param.requires_grad = False
 
+        torch.cuda.empty_cache()
         self.re_fit(train_loader, test_loader)
 
         del train_set

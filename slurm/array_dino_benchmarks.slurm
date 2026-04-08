@@ -1,6 +1,7 @@
 #!/bin/bash
 # Same as run_dino_benchmarks.slurm, but runs both DINO backbones as a job array.
 # Task 0: dinov2_vitb14 — Task 1: dinov3_vitb16
+# Requests two A100 GPUs per task (see --constraint in run_dino_benchmarks.slurm).
 #
 # Submit from repo root:
 #   cd /path/to/MiN-NeurIPS2025

@@ -1,6 +1,7 @@
 #!/bin/bash
 # Run MiN EASE-protocol benchmarks with a DINO backbone (DINOv2 or DINOv3).
-# Uses two GPUs in parallel, matching run_benchmarks.sh (GPU0 / GPU1).
+# Uses two A100 GPUs in parallel, matching run_benchmarks.sh (GPU0 / GPU1).
+# If your site uses typed GRES instead of --constraint (e.g. --gres=gpu:a100:2), edit below.
 #
 # Submit from the MiN-NeurIPS2025 repository root:
 #   cd /path/to/MiN-NeurIPS2025

@@ -3,7 +3,7 @@ import numpy as np
 from PIL import Image
 from torch.utils.data import Dataset
 from torchvision import transforms
-from data_process.data import iCIFAR224, iImageNet_A, iFood101, iOmnibenchmark, iCUB200, iImageNet_R
+from data_process.data import iCIFAR224, iImageNet_A, iFood101, iOmnibenchmark, iCUB200, iImageNet_R, iVTAB, iObjectNet
 from torch.utils.data import DataLoader
 import torch
 import random
@@ -27,6 +27,10 @@ def get_datasets(name, args):
         return iCUB200(args=args)
     elif name == 'imagenetr':
         return iImageNet_R(args=args)
+    elif name == 'vtab':
+        return iVTAB(args=args)
+    elif name == 'objectnet':
+        return iObjectNet(args=args)
     else:
         raise ValueError('Unknown dataset')
 

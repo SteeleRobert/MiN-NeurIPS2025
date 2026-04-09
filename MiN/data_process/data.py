@@ -42,7 +42,7 @@ class iCIFAR224(iData):
         self.class_order = np.arange(100).tolist()
 
     def data_initialization(self):
-        data_path = r'[DATA PATH]'
+        data_path = self.args.get('data_root', r'[DATA PATH]')
         train_dataset = datasets.cifar.CIFAR100(data_path, train=True, download=True)
         test_dataset = datasets.cifar.CIFAR100(data_path, train=False, download=True)
         self.train_data, self.train_targets = train_dataset.data, np.array(
@@ -82,8 +82,13 @@ class iImageNet_A(iData):
         self.class_order = np.arange(200).tolist()
 
     def data_initialization(self):
-        train_dir = r'[DATA PATH]'
-        test_dir = r'[DATA PATH]'
+        data_root = self.args.get('data_root', None)
+        if data_root:
+            train_dir = os.path.join(data_root, 'imagenet-a-split', 'train')
+            test_dir = os.path.join(data_root, 'imagenet-a-split', 'test')
+        else:
+            train_dir = r'[DATA PATH]'
+            test_dir = r'[DATA PATH]'
         self.category_index, self.train_data = split_img_label(train_dir)
         self.category_index, self.test_data = split_img_label(test_dir)
 
@@ -115,8 +120,13 @@ class iFood101(iData):
         self.class_order = np.arange(101).tolist()
 
     def data_initialization(self):
-        train_dir = r'[DATA PATH]'
-        test_dir = r'[DATA PATH]'
+        data_root = self.args.get('data_root', None)
+        if data_root:
+            train_dir = os.path.join(data_root, 'food-101', 'train')
+            test_dir = os.path.join(data_root, 'food-101', 'test')
+        else:
+            train_dir = r'[DATA PATH]'
+            test_dir = r'[DATA PATH]'
         self.category_index, self.train_data = split_img_label(train_dir)
         self.category_index, self.test_data = split_img_label(test_dir)
 
@@ -152,8 +162,13 @@ class iCUB200(iData):
         self.class_order = np.arange(200).tolist()
 
     def data_initialization(self):
-        train_dir = r'[DATA PATH]'
-        test_dir = r'[DATA PATH]'
+        data_root = self.args.get('data_root', None)
+        if data_root:
+            train_dir = os.path.join(data_root, 'cub', 'train')
+            test_dir = os.path.join(data_root, 'cub', 'test')
+        else:
+            train_dir = r'[DATA PATH]'
+            test_dir = r'[DATA PATH]'
         self.category_index, self.train_data = split_img_label(train_dir)
         self.category_index, self.test_data = split_img_label(test_dir)
 
@@ -186,11 +201,54 @@ class iOmnibenchmark(iData):
         self.class_order = np.arange(300).tolist()
 
     def data_initialization(self):
-        train_dir = r'[DATA PATH]'
-        test_dir = r'[DATA PATH]'
-
+        data_root = self.args.get('data_root', None)
+        if data_root:
+            train_dir = os.path.join(data_root, 'omnibenchmark', 'train')
+            test_dir = os.path.join(data_root, 'omnibenchmark', 'test')
+        else:
+            train_dir = r'[DATA PATH]'
+            test_dir = r'[DATA PATH]'
         self.category_index, self.train_data = split_img_label(train_dir)
         self.category_index, self.test_data = split_img_label(test_dir)
+
+class iVTAB(iData):
+    def __init__(self, args):
+        self.args = args
+        self.train_data = None
+        self.test_data = None
+        self.category_index = None
+
+        self.train_trsf = [
+            transforms.RandomResizedCrop(256, scale=(0.08, 1.0), ratio=(3. / 4., 4. / 3.)),
+            transforms.CenterCrop(224),
+            transforms.RandomHorizontalFlip(p=0.5),
+            transforms.ColorJitter(brightness=63 / 255),
+            transforms.ToTensor(),
+            transforms.Normalize(
+                mean=(0.5, 0.5, 0.5), std=(0.5, 0.5, 0.5)
+            ),
+        ]
+        self.test_trsf = [
+            transforms.Resize(256, interpolation=3),
+            transforms.CenterCrop(224),
+            transforms.ToTensor(),
+            transforms.Normalize(
+                mean=(0.5, 0.5, 0.5), std=(0.5, 0.5, 0.5)
+            ),
+        ]
+        self.class_order = np.arange(50).tolist()
+
+    def data_initialization(self):
+        data_root = self.args.get('data_root', None)
+        if data_root:
+            train_dir = os.path.join(data_root, 'vtab', 'train')
+            test_dir = os.path.join(data_root, 'vtab', 'test')
+        else:
+            train_dir = r'[DATA PATH]'
+            test_dir = r'[DATA PATH]'
+        self.category_index, self.train_data = split_img_label(train_dir)
+        self.category_index, self.test_data = split_img_label(test_dir)
+
 
 class iImageNet_R(iData):
     def __init__(self, args):
@@ -221,8 +279,52 @@ class iImageNet_R(iData):
         self.class_order = np.arange(200).tolist()
 
     def data_initialization(self):
-        train_dir = r'[DATA PATH]'
-        test_dir = r'[DATA PATH]'
+        data_root = self.args.get('data_root', None)
+        if data_root:
+            train_dir = os.path.join(data_root, 'imagenet-r-split', 'train')
+            test_dir = os.path.join(data_root, 'imagenet-r-split', 'test')
+        else:
+            train_dir = r'[DATA PATH]'
+            test_dir = r'[DATA PATH]'
+        self.category_index, self.train_data = split_img_label(train_dir)
+        self.category_index, self.test_data = split_img_label(test_dir)
+
+
+class iObjectNet(iData):
+    def __init__(self, args):
+        self.args = args
+        self.train_data = None
+        self.test_data = None
+        self.category_index = None
+
+        self.train_trsf = [
+            transforms.RandomResizedCrop(256, scale=(0.05, 1.0), ratio=(3. / 4., 4. / 3.)),
+            transforms.CenterCrop(224),
+            transforms.RandomHorizontalFlip(p=0.5),
+            transforms.ColorJitter(brightness=63 / 255),
+            transforms.ToTensor(),
+            transforms.Normalize(
+                mean=(0.5, 0.5, 0.5), std=(0.5, 0.5, 0.5)
+            ),
+        ]
+        self.test_trsf = [
+            transforms.Resize(256, interpolation=3),
+            transforms.CenterCrop(224),
+            transforms.ToTensor(),
+            transforms.Normalize(
+                mean=(0.5, 0.5, 0.5), std=(0.5, 0.5, 0.5)
+            ),
+        ]
+        self.class_order = np.arange(200).tolist()
+
+    def data_initialization(self):
+        data_root = self.args.get('data_root', None)
+        if data_root:
+            train_dir = os.path.join(data_root, 'objectnet', 'train')
+            test_dir = os.path.join(data_root, 'objectnet', 'test')
+        else:
+            train_dir = r'[DATA PATH]'
+            test_dir = r'[DATA PATH]'
         self.category_index, self.train_data = split_img_label(train_dir)
         self.category_index, self.test_data = split_img_label(test_dir)
 

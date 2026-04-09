@@ -40,7 +40,7 @@ def calculate_class_metrics(pred: list, label: list):
     for cls in unique_classes:
         cls_indices = np.where(np.array(label) == cls)[0]
         cls_correct = np.sum(np.array(pred)[cls_indices] == cls)
-        class_accuracies[cls] = np.round(cls_correct / len(cls_indices))
+        class_accuracies[cls] = np.round(cls_correct / len(cls_indices), 4)
 
     for i in range(len(pred)):
         class_confusion_matrices[pred[i], label[i]] += 1

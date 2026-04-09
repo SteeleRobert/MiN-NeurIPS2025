@@ -138,12 +138,14 @@ fi
 LOG="$LOG_DIR/${TAG}.log"
 echo "[$TAG] Starting → $LOG"
 
+set +e
 CUDA_VISIBLE_DEVICES=0 .venv/bin/python MiN/main.py \
     --base_configs  "$CONFIGS/base_configs/${BASE_CFG}.json" \
     --model_configs "$CONFIGS/model_configs/${MODEL_CFG}.json" \
     --data_root     "$DATA_ROOT" \
     > "$LOG" 2>&1
 bench_rc=$?
+set -e
 
 echo "[$TAG] Done (exit $bench_rc)."
 strings "$LOG" | grep -E 'FINAL:' | tail -1 || true

@@ -34,7 +34,7 @@ source "$_SCRIPT_DIR/slurm/slack_notify.sh"
 _slack_on_exit_failure() {
     local rc=$?
     [[ $rc -eq 0 ]] && return 0
-    min_slack_notify "*run_benchmarks.sh* — *${BACKBONE}* — FAILED (exit ${rc})"
+    min_slack_notify_failure "$rc" "*run_benchmarks.sh* — *${BACKBONE}*"
 }
 trap '_slack_on_exit_failure' EXIT
 

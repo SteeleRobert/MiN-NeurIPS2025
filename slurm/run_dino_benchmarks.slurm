@@ -13,7 +13,7 @@
 #
 # Optional env overrides:
 #   REPO_ROOT     — repo path (default: directory from which sbatch was run)
-#   DATA_ROOT     — datasets (default: /gpfs/data/oermannlab/users/zhouj14 on bigpurple)
+#   DATA_ROOT     — datasets (default: /gpfs/data/oermannlab/public_data/continual_learning on bigpurple)
 #   LOG_DIR       — benchmark logs (default: $HOME/min_benchmark_logs/<BACKBONE>)
 # Slack on completion (optional): export SLACK_WEBHOOK_URL=... or create
 #   slurm/.slack_webhook_url (see slurm/slack_notify.sh).
@@ -59,7 +59,7 @@ fi
 export GPU0=0
 export GPU1=1
 export BACKBONE
-export DATA_ROOT="${DATA_ROOT:-/gpfs/data/oermannlab/users/zhouj14}"
+export DATA_ROOT="${DATA_ROOT:-/gpfs/data/oermannlab/public_data/continual_learning}"
 export LOG_DIR="${LOG_DIR:-$HOME/min_benchmark_logs/${BACKBONE}}"
 
 echo "=== MiN DINO benchmarks ==="

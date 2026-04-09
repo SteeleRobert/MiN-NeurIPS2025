@@ -47,7 +47,7 @@ fi
 export GPU0=0
 export GPU1=1
 export BACKBONE
-export DATA_ROOT="${DATA_ROOT:-/gpfs/data/oermannlab/users/zhouj14}"
+export DATA_ROOT="${DATA_ROOT:-/gpfs/data/oermannlab/public_data/continual_learning}"
 export LOG_DIR="${LOG_DIR:-$HOME/min_benchmark_logs/${BACKBONE}}"
 
 echo "=== MiN DINO benchmarks [array task $SLURM_ARRAY_TASK_ID] ==="

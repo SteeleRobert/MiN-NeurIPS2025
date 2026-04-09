@@ -1,6 +1,6 @@
 # DINO benchmark sweeps (Slurm)
 
-This directory contains Slurm scripts to run all MiN EASE-protocol benchmarks with DINO backbones (`dinov2_vitb14`, `dinov3_vitb16`). All benchmarks run in parallel — one per GPU — on a single node with 7 GPUs.
+This directory contains Slurm scripts to run all MiN EASE-protocol benchmarks with DINO backbones (`dinov2_vitb14`, `dinov3_vitb16`). Each benchmark runs as a separate array task on its own GPU.
 
 ## Prerequisites
 
@@ -17,7 +17,7 @@ Slurm jobs require `.venv/bin/python` to exist. The scripts exit with an error i
 
 ### Data
 
-By default, `DATA_ROOT` is `/gpfs/data/oermannlab/public_data/continual_learning` (bigpurple shared data). The scripts run `prepare_data.py` automatically when ImageNet-R / ImageNet-A train–test splits are missing. Benchmarks whose data directories are absent or empty are skipped. Override the location with `DATA_ROOT` if your data live elsewhere.
+By default, `DATA_ROOT` is `/gpfs/data/oermannlab/public_data/continual_learning` (bigpurple shared data). The scripts run `prepare_data.py` automatically when ImageNet-R / ImageNet-A train–test splits are missing. Benchmarks whose data directories are absent or empty exit cleanly (code 0) without failing the array job. Override the location with `DATA_ROOT` if your data live elsewhere.
 
 ### DINOv3 (Hugging Face)
 
@@ -43,13 +43,13 @@ cd /path/to/MiN-NeurIPS2025
 
 ## Ways to run
 
-### Option A: two separate jobs (DINOv2 and DINOv3)
+### Option A: two per-backbone arrays (DINOv2 and DINOv3)
 
 ```bash
 ./slurm/submit_dino_backbones.sh
 ```
 
-Submits `run_dino_benchmarks.slurm` twice: once for `BACKBONE=dinov2_vitb14`, once for `BACKBONE=dinov3_vitb16`. Both jobs run concurrently (subject to scheduler availability).
+Submits `run_dino_benchmarks.slurm` as a 7-task array twice: once for `BACKBONE=dinov2_vitb14`, once for `BACKBONE=dinov3_vitb16`. Both arrays are submitted immediately and run concurrently (subject to scheduler availability).
 
 Optional Slurm overrides (example):
 
@@ -57,7 +57,7 @@ Optional Slurm overrides (example):
 SLURM_EXTRA="--partition=gpu4_short --time=12:00:00" ./slurm/submit_dino_backbones.sh
 ```
 
-### Option B: single backbone
+### Option B: single backbone array
 
 ```bash
 sbatch --export=ALL,BACKBONE=dinov2_vitb14 slurm/run_dino_benchmarks.slurm
@@ -65,38 +65,50 @@ sbatch --export=ALL,BACKBONE=dinov2_vitb14 slurm/run_dino_benchmarks.slurm
 sbatch --export=ALL,BACKBONE=dinov3_vitb16 slurm/run_dino_benchmarks.slurm
 ```
 
-Allowed values for `BACKBONE` are `dinov2_vitb14` and `dinov3_vitb16` only.
+Submits a 7-task array (`--array=0-6`). Allowed values for `BACKBONE` are `dinov2_vitb14` and `dinov3_vitb16` only.
 
-### Option C: job array (both backbones, one submission)
+To run a single benchmark only (e.g. CIFAR-100):
+
+```bash
+sbatch --array=0 --export=ALL,BACKBONE=dinov2_vitb14 slurm/run_dino_benchmarks.slurm
+```
+
+### Option C: combined array (both backbones, one submission)
 
 ```bash
 sbatch slurm/array_dino_benchmarks.slurm
 ```
 
-- Array index `0` → `dinov2_vitb14`; index `1` → `dinov3_vitb16`.
-- `#SBATCH --array=0-1%2` runs both array tasks in parallel on two separate nodes.
-- To run only one backbone: `sbatch --array=0 slurm/array_dino_benchmarks.slurm` (DINOv2) or `--array=1` (DINOv3).
+Submits 14 array tasks (`--array=0-13`): tasks 0–6 run all 7 benchmarks with `dinov2_vitb14`; tasks 7–13 run the same benchmarks with `dinov3_vitb16`.
 
-## Parallel execution
+To run only one backbone:
 
-Each job requests **7 GPUs** (one per benchmark). All available benchmarks are launched simultaneously as background processes; `wait` collects them at the end. GPU assignment is sequential: CIFAR-100 always gets GPU 0, then each subsequent benchmark that passes the data check gets the next GPU index.
+```bash
+sbatch --array=0-6  slurm/array_dino_benchmarks.slurm   # DINOv2 only
+sbatch --array=7-13 slurm/array_dino_benchmarks.slurm   # DINOv3 only
+```
 
-Benchmarks and their protocols:
+## Array task layout
 
-| Benchmark     | Protocol       | Data check path                                  |
-|---------------|----------------|--------------------------------------------------|
-| CIFAR-100     | B0-Inc5 (20T)  | auto-downloads, always runs                      |
-| ImageNet-R    | B0-Inc10 (20T) | `$DATA_ROOT/imagenet-r-split/{train,test}/`      |
-| ImageNet-A    | B0-Inc20 (10T) | `$DATA_ROOT/imagenet-a-split/{train,test}/`      |
-| CUB-200       | B0-Inc10 (20T) | `$DATA_ROOT/cub/{train,test}/`                   |
-| OmniBenchmark | B0-Inc30 (10T) | `$DATA_ROOT/omnibenchmark/{train,test}/`         |
-| VTAB          | B0-Inc10 (5T)  | `$DATA_ROOT/vtab/{train,test}/`                  |
-| ObjectNet     | B0-Inc10 (20T) | `$DATA_ROOT/objectnet/{train,test}/`             |
+Each array task runs **one benchmark on one GPU**. The benchmark index (within a backbone) maps as follows:
+
+| Task index (mod 7) | Benchmark     | Protocol       | Data check path                             |
+|--------------------|---------------|----------------|---------------------------------------------|
+| 0                  | CIFAR-100     | B0-Inc5 (20T)  | auto-downloads, always runs                 |
+| 1                  | ImageNet-R    | B0-Inc10 (20T) | `$DATA_ROOT/imagenet-r/{train,test}/`       |
+| 2                  | ImageNet-A    | B0-Inc20 (10T) | `$DATA_ROOT/imagenet-a/{train,test}/`       |
+| 3                  | CUB-200       | B0-Inc10 (20T) | `$DATA_ROOT/cub/{train,test}/`              |
+| 4                  | OmniBenchmark | B0-Inc30 (10T) | `$DATA_ROOT/omnibenchmark/{train,test}/`    |
+| 5                  | VTAB          | B0-Inc10 (5T)  | `$DATA_ROOT/vtab/{train,test}/`             |
+| 6                  | ObjectNet     | B0-Inc10 (20T) | `$DATA_ROOT/objectnet/{train,test}/`        |
+
+For `array_dino_benchmarks.slurm`, task IDs 0–6 are `dinov2_vitb14` and 7–13 are `dinov3_vitb16`.
 
 ## Environment variables
 
 | Variable | Purpose |
 |----------|---------|
+| `BACKBONE` | Required for `run_dino_benchmarks.slurm`; derived from task ID in `array_dino_benchmarks.slurm` |
 | `DATA_ROOT` | Dataset root (default `/gpfs/data/oermannlab/public_data/continual_learning`) |
 | `LOG_DIR` | Benchmark logs (default `$HOME/min_benchmark_logs/<BACKBONE>`) |
 | `REPO_ROOT` | Repo path; usually unnecessary (defaults to `SLURM_SUBMIT_DIR`) |
@@ -111,7 +123,7 @@ sbatch --export=ALL,BACKBONE=dinov2_vitb14,DATA_ROOT=/path/to/data,LOG_DIR=/path
 
 ## Slurm directives and site configuration
 
-Both `run_dino_benchmarks.slurm` and `array_dino_benchmarks.slurm` request **1 node, 7 GPUs, 56 CPUs, 224G memory, 3 days**, partition `a100_short`. Adjust `#SBATCH` lines to match your cluster. If fewer than 7 datasets are available, some GPUs will be idle — you can lower `--gres=gpu` accordingly.
+Each array task requests **1 node, 1 GPU, 8 CPUs, 32G memory, 3 days**, partition `a100_short`. Adjust `#SBATCH` lines to match your cluster.
 
 If your site requires **account** or **QoS**, uncomment and set in the `.slurm` files:
 
@@ -122,16 +134,16 @@ If your site requires **account** or **QoS**, uncomment and set in the `.slurm` 
 
 ## Outputs and monitoring
 
-- **Slurm stdout/stderr**: `dino-bench-<jobid>.out` / `.err` in the repository root. Array jobs use `dino-bench-%A_%a.out` / `.err`.
+- **Slurm stdout/stderr**: `dino-bench-<arrayid>_<taskid>.out` / `.err` in the repository root.
 - **Benchmark logs**: `$LOG_DIR/<benchmark>_<backbone>.log` for each run.
-- **FINAL lines**: `strings <logfile> | grep FINAL` — printed to the job's stdout at completion.
+- **FINAL lines**: `strings <logfile> | grep FINAL` — printed to the task's stdout at completion.
 - **Queue**: `squeue -u "$USER"`
 
 ## Files in this directory
 
 | File | Role |
 |------|------|
-| `run_dino_benchmarks.slurm` | Single job; set `BACKBONE` via `--export` |
-| `array_dino_benchmarks.slurm` | Array over both DINO backbones (runs in parallel, `%2`) |
-| `submit_dino_backbones.sh` | Submits two separate jobs (DINOv2 then DINOv3) |
+| `run_dino_benchmarks.slurm` | 7-task array (one per benchmark); set `BACKBONE` via `--export` |
+| `array_dino_benchmarks.slurm` | 14-task array over both DINO backbones (7 benchmarks × 2 backbones) |
+| `submit_dino_backbones.sh` | Submits two 7-task arrays (DINOv2 then DINOv3) |
 | `slack_notify.sh` | Sourced by Slurm scripts for optional Slack notifications |

@@ -1,16 +1,26 @@
 #!/bin/bash
 # Run all MiN EASE-protocol benchmarks for both DINO backbones as a job array.
-# Task 0: dinov2_vitb14 — Task 1: dinov3_vitb16
-# Each array task requests 7 GPUs and runs all benchmarks in parallel (one per GPU).
-# Both array tasks run concurrently (%2), each on its own node.
+# 14 array tasks total: indices 0–6 for dinov2_vitb14, indices 7–13 for dinov3_vitb16.
+# Each task runs one benchmark on one GPU.
+#
+# Array index → (backbone, benchmark) mapping:
+#   Task 0–6  (backbone=dinov2_vitb14):
+#     0: CIFAR-100, 1: ImageNet-R, 2: ImageNet-A, 3: CUB-200
+#     4: OmniBenchmark, 5: VTAB, 6: ObjectNet
+#   Task 7–13 (backbone=dinov3_vitb16):
+#     7: CIFAR-100, 8: ImageNet-R, 9: ImageNet-A, 10: CUB-200
+#     11: OmniBenchmark, 12: VTAB, 13: ObjectNet
 #
 # Submit from repo root:
 #   cd /path/to/MiN-NeurIPS2025
 #   sbatch slurm/array_dino_benchmarks.slurm
 #
 # To run only one backbone:
-#   sbatch --array=0 slurm/array_dino_benchmarks.slurm   # DINOv2 only
-#   sbatch --array=1 slurm/array_dino_benchmarks.slurm   # DINOv3 only
+#   sbatch --array=0-6   slurm/array_dino_benchmarks.slurm   # DINOv2 only
+#   sbatch --array=7-13  slurm/array_dino_benchmarks.slurm   # DINOv3 only
+#
+# To run a single benchmark with one backbone (e.g. DINOv2 CIFAR-100):
+#   sbatch --array=0     slurm/array_dino_benchmarks.slurm
 #
 # Slack on completion (optional): export SLACK_WEBHOOK_URL=... or slurm/.slack_webhook_url
 #
@@ -19,20 +29,25 @@
 ##SBATCH --qos=<YOUR_QOS>
 
 #SBATCH --job-name=min-dino-array
-#SBATCH --array=0-1%2
+#SBATCH --array=0-13
 #SBATCH --partition=a100_short
 #SBATCH --nodes=1
-#SBATCH --cpus-per-task=56
-#SBATCH --mem=224G
-#SBATCH --gres=gpu:7
+#SBATCH --cpus-per-task=8
+#SBATCH --mem=32G
+#SBATCH --gres=gpu:1
 #SBATCH --time=3-00:00:00
 #SBATCH --output=dino-bench-%A_%a.out
 #SBATCH --error=dino-bench-%A_%a.err
 
 set -euo pipefail
 
+# ── Resolve backbone and benchmark index from array task ID ──────────────────
 BACKBONES=(dinov2_vitb14 dinov3_vitb16)
-BACKBONE="${BACKBONES[$SLURM_ARRAY_TASK_ID]}"
+N_BENCH=7
+
+BACKBONE_IDX=$(( SLURM_ARRAY_TASK_ID / N_BENCH ))
+BENCH_IDX=$(( SLURM_ARRAY_TASK_ID % N_BENCH ))
+BACKBONE="${BACKBONES[$BACKBONE_IDX]}"
 
 REPO_ROOT="${REPO_ROOT:-${SLURM_SUBMIT_DIR:-}}"
 if [[ -z "$REPO_ROOT" || ! -f "$REPO_ROOT/run_benchmarks.sh" ]]; then
@@ -54,14 +69,6 @@ mkdir -p "$LOG_DIR"
 # shellcheck source=slack_notify.sh
 source "$REPO_ROOT/slurm/slack_notify.sh"
 
-echo "=== MiN DINO benchmarks (all parallel) [array task $SLURM_ARRAY_TASK_ID] ==="
-echo "BACKBONE=$BACKBONE"
-echo "Host: $(hostname)"
-echo "Start: $(date -Is)"
-echo "DATA_ROOT=$DATA_ROOT"
-echo "LOG_DIR=$LOG_DIR"
-echo "==========================================================================="
-
 # ── Config suffix ─────────────────────────────────────────────────────────────
 case "$BACKBONE" in
     dinov2_vitb14) BSUFFIX="-dinov2vitb14" ; BTAG="_${BACKBONE}" ;;
@@ -69,106 +76,68 @@ case "$BACKBONE" in
 esac
 CONFIGS="MiN/configs"
 
+# ── Benchmark definitions (indexed by BENCH_IDX) ─────────────────────────────
+BENCH_BASE=(    cifar_ease        imagenetr_ease        imageneta_ease        cub_ease              omnibenchmark_ease       vtab_ease           objectnet_ease        )
+BENCH_MODEL=(   MiN-cifar-10steps MiN-inr-10steps       MiN-imageneta         MiN-cub-10steps       MiN-omni-10steps         MiN-vtab-5steps     MiN-inr-10steps       )
+BENCH_TAG=(     cifar100_ease_20T imagenetr_ease_20T    imageneta_ease_10T    cub200_ease_20T       omnibenchmark_ease_10T   vtab_ease_5T        objectnet_ease_20T    )
+BENCH_TRAIN=(   ""                imagenet-r/train      imagenet-a/train      cub/train             omnibenchmark/train      vtab/train          objectnet/train       )
+BENCH_TEST=(    ""                imagenet-r/test       imagenet-a/test       cub/test              omnibenchmark/test       vtab/test           objectnet/test        )
+
+BASE_CFG="${BENCH_BASE[$BENCH_IDX]}"
+MODEL_CFG="${BENCH_MODEL[$BENCH_IDX]}${BSUFFIX}"
+TAG="${BENCH_TAG[$BENCH_IDX]}${BTAG}"
+TRAIN_DIR="${BENCH_TRAIN[$BENCH_IDX]}"
+TEST_DIR="${BENCH_TEST[$BENCH_IDX]}"
+
+echo "=== MiN DINO benchmark [array task $SLURM_ARRAY_TASK_ID: backbone=$BACKBONE_IDX bench=$BENCH_IDX] ==="
+echo "Host:       $(hostname)"
+echo "Start:      $(date -Is)"
+echo "BACKBONE:   $BACKBONE"
+echo "Benchmark:  $TAG"
+echo "DATA_ROOT:  $DATA_ROOT"
+echo "LOG_DIR:    $LOG_DIR"
+echo "================================================================================="
+
 # ── Ensure train/test splits exist for ImageNet-R and ImageNet-A ──────────────
-need_prepare=0
-for split in imagenet-r imagenet-a; do
-    if [[ ! -d "$DATA_ROOT/$split/train" || ! -d "$DATA_ROOT/$split/test" ]]; then
-        need_prepare=1
-        break
+if [[ "$BENCH_IDX" == "1" || "$BENCH_IDX" == "2" ]]; then
+    if [[ ! -d "$DATA_ROOT/${TRAIN_DIR}" || ! -d "$DATA_ROOT/${TEST_DIR}" ]]; then
+        echo "Train/test splits missing for $TAG — running prepare_data.py..."
+        .venv/bin/python prepare_data.py --data-root "$DATA_ROOT"
+    else
+        echo "Train/test splits present, skipping prepare_data.py."
     fi
-done
-if [[ $need_prepare -eq 1 ]]; then
-    echo "Train/test splits missing — running prepare_data.py..."
-    .venv/bin/python prepare_data.py --data-root "$DATA_ROOT"
-else
-    echo "Train/test splits present, skipping prepare_data.py."
 fi
 
-# ── Helpers ───────────────────────────────────────────────────────────────────
-# data_ok <tag> <train_dir> <test_dir>
-data_ok() {
-    local tag="$1" train_dir="$2" test_dir="$3"
-    for dir in "$train_dir" "$test_dir"; do
+# ── Data check (skip benchmarks whose data is absent) ────────────────────────
+if [[ -n "$TRAIN_DIR" ]]; then
+    for dir in "$DATA_ROOT/$TRAIN_DIR" "$DATA_ROOT/$TEST_DIR"; do
         if [[ ! -d "$dir" ]]; then
-            echo "[$tag] Skipped — directory not found: $dir"
-            return 1
+            echo "[$TAG] Skipped — directory not found: $dir"
+            exit 0
         fi
         if [[ -z "$(find "$dir" -mindepth 1 -maxdepth 1 -type d -print -quit 2>/dev/null)" ]]; then
-            echo "[$tag] Skipped — no class subdirectories in: $dir"
-            return 1
+            echo "[$TAG] Skipped — no class subdirectories in: $dir"
+            exit 0
         fi
     done
-    return 0
-}
-
-run_bench() {
-    local base="$1" model="$2" gpu="$3" tag="$4"
-    local log="$LOG_DIR/${tag}.log"
-    echo "[$tag] Starting on GPU $gpu → $log"
-    CUDA_VISIBLE_DEVICES="$gpu" .venv/bin/python MiN/main.py \
-        --base_configs  "$CONFIGS/base_configs/${base}.json" \
-        --model_configs "$CONFIGS/model_configs/${model}.json" \
-        > "$log" 2>&1
-    local rc=$?
-    echo "[$tag] Done (exit $rc)."
-    strings "$log" | grep -E 'FINAL:' | tail -1 || true
-    return $rc
-}
-
-# ── Launch all benchmarks in parallel ─────────────────────────────────────────
-gpu=0
-
-# CIFAR-100 B0-Inc5 (20T) — always runs (auto-downloads)
-run_bench cifar_ease "MiN-cifar-10steps${BSUFFIX}" $((gpu++)) "cifar100_ease_20T${BTAG}" &
-
-# ImageNet-R B0-Inc10 (20T)
-if data_ok "imagenetr_ease_20T${BTAG}" "$DATA_ROOT/imagenet-r/train" "$DATA_ROOT/imagenet-r/test"; then
-    run_bench imagenetr_ease "MiN-inr-10steps${BSUFFIX}" $((gpu++)) "imagenetr_ease_20T${BTAG}" &
 fi
 
-# ImageNet-A B0-Inc20 (10T)
-if data_ok "imageneta_ease_10T${BTAG}" "$DATA_ROOT/imagenet-a/train" "$DATA_ROOT/imagenet-a/test"; then
-    run_bench imageneta_ease "MiN-imageneta${BSUFFIX}" $((gpu++)) "imageneta_ease_10T${BTAG}" &
-fi
+# ── Run benchmark ─────────────────────────────────────────────────────────────
+LOG="$LOG_DIR/${TAG}.log"
+echo "[$TAG] Starting → $LOG"
 
-# CUB-200 B0-Inc10 (20T)
-if data_ok "cub200_ease_20T${BTAG}" "$DATA_ROOT/cub/train" "$DATA_ROOT/cub/test"; then
-    run_bench cub_ease "MiN-cub-10steps${BSUFFIX}" $((gpu++)) "cub200_ease_20T${BTAG}" &
-fi
+CUDA_VISIBLE_DEVICES=0 .venv/bin/python MiN/main.py \
+    --base_configs  "$CONFIGS/base_configs/${BASE_CFG}.json" \
+    --model_configs "$CONFIGS/model_configs/${MODEL_CFG}.json" \
+    > "$LOG" 2>&1
+bench_rc=$?
 
-# OmniBenchmark B0-Inc30 (10T)
-if data_ok "omnibenchmark_ease_10T${BTAG}" "$DATA_ROOT/omnibenchmark/train" "$DATA_ROOT/omnibenchmark/test"; then
-    run_bench omnibenchmark_ease "MiN-omni-10steps${BSUFFIX}" $((gpu++)) "omnibenchmark_ease_10T${BTAG}" &
-fi
+echo "[$TAG] Done (exit $bench_rc)."
+strings "$LOG" | grep -E 'FINAL:' | tail -1 || true
 
-# VTAB B0-Inc10 (5T)
-if data_ok "vtab_ease_5T${BTAG}" "$DATA_ROOT/vtab/train" "$DATA_ROOT/vtab/test"; then
-    run_bench vtab_ease "MiN-vtab-5steps${BSUFFIX}" $((gpu++)) "vtab_ease_5T${BTAG}" &
-fi
-
-# ObjectNet B0-Inc10 (20T)
-if data_ok "objectnet_ease_20T${BTAG}" "$DATA_ROOT/objectnet/train" "$DATA_ROOT/objectnet/test"; then
-    run_bench objectnet_ease "MiN-inr-10steps${BSUFFIX}" $((gpu++)) "objectnet_ease_20T${BTAG}" &
-fi
-
-# Wait for all parallel benchmarks
-bench_rc=0
-wait || bench_rc=$?
-
-# ── Summary ───────────────────────────────────────────────────────────────────
-echo ""
-echo "=== Finished: $(date -Is) (exit $bench_rc) ==="
-echo ""
-echo "Summary (FINAL lines):"
-for log in "$LOG_DIR"/*${BTAG}*.log; do
-    [[ -f "$log" ]] || continue
-    tag=$(basename "$log" .log)
-    result=$(strings "$log" | grep -E 'FINAL:' | tail -1 || true)
-    echo "  [$tag] ${result:-no FINAL line}"
-done
-
+# ── Notify ────────────────────────────────────────────────────────────────────
 if [[ $bench_rc -eq 0 ]]; then
-    min_slack_notify "finished OK — all benchmarks"
+    min_slack_notify "finished OK — $TAG"
 else
     min_slack_notify_failure "$bench_rc"
     exit "$bench_rc"

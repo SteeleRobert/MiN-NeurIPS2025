@@ -23,9 +23,8 @@
 ##SBATCH --qos=<YOUR_QOS>
 
 #SBATCH --job-name=min-dino-bench
-#SBATCH --partition=gpu4_medium
+#SBATCH --partition=a100_short
 #SBATCH --nodes=1
-#SBATCH --ntasks=1
 #SBATCH --cpus-per-task=16
 #SBATCH --mem=64G
 #SBATCH --gres=gpu:2

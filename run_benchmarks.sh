@@ -20,6 +20,37 @@
 
 set -euo pipefail
 
+# ── Slack notifications ───────────────────────────────────────────────────────
+# Source the shared helper (no-op if webhook is not configured).
+# Configure via:  export SLACK_WEBHOOK_URL='https://hooks.slack.com/services/...'
+# or:             echo 'https://...' > slurm/.slack_webhook_url
+_SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# shellcheck source=slurm/slack_notify.sh
+source "$_SCRIPT_DIR/slurm/slack_notify.sh"
+
+_slack_on_exit() {
+    local rc=$?
+    # Collect FINAL lines from all benchmark logs for this run
+    local summary=""
+    if [[ -d "$LOG_DIR" ]]; then
+        for log in "$LOG_DIR"/*${BTAG}*.log; do
+            [[ -f "$log" ]] || continue
+            local tag final_line
+            tag=$(basename "$log" .log)
+            final_line=$(strings "$log" 2>/dev/null | grep -i 'FINAL:' | tail -1 || true)
+            [[ -n "$final_line" ]] && summary+="${tag}: ${final_line}\n"
+        done
+    fi
+    if [[ $rc -eq 0 ]]; then
+        local msg="*run_benchmarks.sh* — *${BACKBONE}* — finished OK"
+        [[ -n "$summary" ]] && msg+=$'\n'"$(printf '%b' "$summary")"
+        min_slack_notify "$msg"
+    else
+        min_slack_notify "*run_benchmarks.sh* — *${BACKBONE}* — FAILED (exit ${rc})"
+    fi
+}
+trap '_slack_on_exit' EXIT
+
 GPU0="${GPU0:-0}"
 GPU1="${GPU1:-1}"
 LOG_DIR="${LOG_DIR:-$HOME/min_benchmark_logs}"

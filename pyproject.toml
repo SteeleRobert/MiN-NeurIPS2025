@@ -4,13 +4,15 @@ version = "0.1.0"
 description = "Mixture of Noise for Pre-Trained Model-Based Class-Incremental Learning"
 requires-python = ">=3.10"
 dependencies = [
-    "torch==2.0.0",
-    "torchvision==0.15.1",
+    # transformers 5.5+ requires torch>=2.4 for AutoModel (DINOv3 via HF)
+    "torch==2.4.1",
+    "torchvision==0.19.1",
     "timm",
     "scikit-learn",
     "scipy",
     "einops>=0.8.2",
     "numpy<2",
+    "transformers>=5.5.0",
 ]
 
 [[tool.uv.index]]

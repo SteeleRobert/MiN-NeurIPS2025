@@ -54,9 +54,29 @@ min_slack_notify() {
     fi
     line+=" — ${status_msg}"
 
+    # Slack often renders top-level "text" as plain; Block Kit "mrkdwn" sections get formatting.
+    # Top-level "text" remains the push-notification / accessibility fallback.
     local payload
     if command -v python3 >/dev/null 2>&1; then
-        payload="$(python3 -c 'import json,sys; print(json.dumps({"text": sys.argv[1]}))' "$line")" || payload=""
+        payload="$(python3 -c '
+import json, sys
+line = sys.argv[1]
+body = {
+    "text": line,
+    "blocks": [
+        {
+            "type": "section",
+            "text": {"type": "mrkdwn", "text": line},
+        }
+    ],
+}
+print(json.dumps(body))
+' "$line")" || payload=""
+    fi
+    if [[ -z "$payload" ]] && command -v jq >/dev/null 2>&1; then
+        payload="$(jq -n --arg line "$line" \
+            '{text: $line, blocks: [{type: "section", text: {type: "mrkdwn", text: $line}}]}')" \
+            || payload=""
     fi
     if [[ -z "$payload" ]]; then
         line="${line//\\/\\\\}"

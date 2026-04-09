@@ -28,11 +28,20 @@ _SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # shellcheck source=slurm/slack_notify.sh
 source "$_SCRIPT_DIR/slurm/slack_notify.sh"
 
-_slack_on_exit() {
+# Failure-only on EXIT: any exit with non-zero (set -e, explicit exit 1, signal) notifies here.
+# Success is *not* sent from EXIT — it is sent once at the bottom after all batches finish, so a
+# stray exit 0 (duplicate shell, wrapper bug) cannot produce a false "finished OK" while work continues.
+_slack_on_exit_failure() {
     local rc=$?
-    # Collect FINAL lines from all benchmark logs for this run
+    [[ $rc -eq 0 ]] && return 0
+    min_slack_notify "*run_benchmarks.sh* — *${BACKBONE}* — FAILED (exit ${rc})"
+}
+trap '_slack_on_exit_failure' EXIT
+
+_slack_notify_success() {
     local summary=""
-    if [[ -d "$LOG_DIR" ]]; then
+    if [[ -d "${LOG_DIR:-}" ]]; then
+        local log
         for log in "$LOG_DIR"/*${BTAG}*.log; do
             [[ -f "$log" ]] || continue
             local tag final_line
@@ -41,15 +50,10 @@ _slack_on_exit() {
             [[ -n "$final_line" ]] && summary+="${tag}: ${final_line}\n"
         done
     fi
-    if [[ $rc -eq 0 ]]; then
-        local msg="*run_benchmarks.sh* — *${BACKBONE}* — finished OK"
-        [[ -n "$summary" ]] && msg+=$'\n'"$(printf '%b' "$summary")"
-        min_slack_notify "$msg"
-    else
-        min_slack_notify "*run_benchmarks.sh* — *${BACKBONE}* — FAILED (exit ${rc})"
-    fi
+    local msg="*run_benchmarks.sh* — *${BACKBONE}* — finished OK"
+    [[ -n "$summary" ]] && msg+=$'\n'"$(printf '%b' "$summary")"
+    min_slack_notify "$msg"
 }
-trap '_slack_on_exit' EXIT
 
 GPU0="${GPU0:-0}"
 GPU1="${GPU1:-1}"
@@ -191,3 +195,5 @@ for log in "$LOG_DIR"/*.log; do
     result=$(strings "$log" | grep -Ei 'accuracy|final' | tail -3 | tr '\n' '  ' || true)
     echo "  [$tag] $result"
 done
+
+_slack_notify_success

@@ -17,7 +17,7 @@ Slurm jobs require `.venv/bin/python` to exist. The scripts exit with an error i
 
 ### Data
 
-By default, `DATA_ROOT` is `$HOME/qz-compcont-learning/data`. `run_benchmarks.sh` runs `prepare_data.py` when ImageNet-R / ImageNet-A train–test splits are missing. Some datasets (e.g. CUB-200, Omnibenchmark) must be laid out manually under that tree; see comments at the top of `run_benchmarks.sh`. Override the location with `DATA_ROOT` if your data live elsewhere.
+By default, `DATA_ROOT` is `/gpfs/data/oermannlab/users/zhouj14` (bigpurple shared data). `run_benchmarks.sh` runs `prepare_data.py` when ImageNet-R / ImageNet-A train–test splits are missing. Some datasets (e.g. CUB-200, Omnibenchmark) must be laid out manually under that tree; see comments at the top of `run_benchmarks.sh`. Override the location with `DATA_ROOT` if your data live elsewhere.
 
 ### DINOv3 (Hugging Face)
 
@@ -80,7 +80,7 @@ sbatch slurm/array_dino_benchmarks.slurm
 
 | Variable | Purpose |
 |----------|---------|
-| `DATA_ROOT` | Dataset root (default `$HOME/qz-compcont-learning/data`) |
+| `DATA_ROOT` | Dataset root (default `/gpfs/data/oermannlab/users/zhouj14` on bigpurple) |
 | `LOG_DIR` | Benchmark logs (default `$HOME/min_benchmark_logs/<BACKBONE>`) |
 | `REPO_ROOT` | Repo path; usually unnecessary (defaults to the directory from which you ran `sbatch`) |
 | `SLACK_WEBHOOK_URL` | Optional Slack notification on job completion |

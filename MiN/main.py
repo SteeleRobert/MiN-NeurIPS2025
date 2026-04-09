@@ -7,8 +7,10 @@ def main():
     args = setup_parser().parse_args()
     base_param = load_json(args.base_configs)
     model_param = load_json(args.model_configs)
-    args = {**base_param, **model_param}
-    train(args)
+    merged = {**base_param, **model_param}
+    if args.data_root is not None:
+        merged['data_root'] = args.data_root
+    train(merged)
 
 
 def load_json(settings_path):
@@ -23,6 +25,8 @@ def setup_parser():
                         help='Json file of base settings.')
     parser.add_argument('--model_configs', type=str, default='./configs/model_configs/',
                         help='Json file of model settings.')
+    parser.add_argument('--data_root', type=str, default=None,
+                        help='Override data_root from base config.')
 
     return parser
 

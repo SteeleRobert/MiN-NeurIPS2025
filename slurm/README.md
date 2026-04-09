@@ -109,7 +109,7 @@ For `array_dino_benchmarks.slurm`, task IDs 0–6 are `dinov2_vitb14` and 7–13
 | Variable | Purpose |
 |----------|---------|
 | `BACKBONE` | Required for `run_dino_benchmarks.slurm`; derived from task ID in `array_dino_benchmarks.slurm` |
-| `DATA_ROOT` | Dataset root (default `/gpfs/data/oermannlab/public_data/continual_learning`) |
+| `DATA_ROOT` | Dataset root (default `/gpfs/data/oermannlab/public_data/continual_learning`). Passed to `main.py` via `--data_root`, overriding the hardcoded path in base config JSONs. |
 | `LOG_DIR` | Benchmark logs (default `$HOME/min_benchmark_logs/<BACKBONE>`) |
 | `REPO_ROOT` | Repo path; usually unnecessary (defaults to `SLURM_SUBMIT_DIR`) |
 | `SLACK_WEBHOOK_URL` | Optional Slack notification on job completion |

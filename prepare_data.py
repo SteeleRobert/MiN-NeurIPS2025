@@ -5,10 +5,10 @@ qz-compcont-learning data directory stores ImageNet-R and ImageNet-A as flat
 folders (200 class dirs, all images mixed). This script creates a symlink-based
 train/test split (80/20 per class, deterministic by seed) under:
 
-  <data_root>/imagenet-r-split/train/<class>/
-  <data_root>/imagenet-r-split/test/<class>/
-  <data_root>/imagenet-a-split/train/<class>/
-  <data_root>/imagenet-a-split/test/<class>/
+  <data_root>/imagenet-r/train/<class>/
+  <data_root>/imagenet-r/test/<class>/
+  <data_root>/imagenet-a/train/<class>/
+  <data_root>/imagenet-a/test/<class>/
 
 Run once before run_benchmarks.sh.
 """
@@ -51,6 +51,7 @@ def make_split(flat_dir, split_dir, train_ratio=0.8, seed=1993):
     class_dirs = sorted(
         d for d in os.listdir(flat_dir)
         if os.path.isdir(os.path.join(flat_dir, d))
+        and d not in ('train', 'test')
     )
 
     total_train, total_test = 0, 0
@@ -100,16 +101,12 @@ def main():
     )
     args = parser.parse_args()
 
-    datasets = [
-        ('imagenet-r', 'imagenet-r-split'),
-        ('imagenet-a', 'imagenet-a-split'),
-    ]
+    datasets = ['imagenet-r', 'imagenet-a']
 
-    for src_name, dst_name in datasets:
-        flat_dir = os.path.join(args.data_root, src_name)
-        split_dir = os.path.join(args.data_root, dst_name)
-        print(f"Processing {src_name}...")
-        make_split(flat_dir, split_dir, train_ratio=args.train_ratio, seed=args.seed)
+    for name in datasets:
+        flat_dir = os.path.join(args.data_root, name)
+        print(f"Processing {name}...")
+        make_split(flat_dir, flat_dir, train_ratio=args.train_ratio, seed=args.seed)
 
     print("Done. Data ready for run_benchmarks.sh.")
 

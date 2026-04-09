@@ -71,7 +71,7 @@ CONFIGS="MiN/configs"
 
 # ── Ensure train/test splits exist for ImageNet-R and ImageNet-A ──────────────
 need_prepare=0
-for split in imagenet-r-split imagenet-a-split; do
+for split in imagenet-r imagenet-a; do
     if [[ ! -d "$DATA_ROOT/$split/train" || ! -d "$DATA_ROOT/$split/test" ]]; then
         need_prepare=1
         break
@@ -122,12 +122,12 @@ gpu=0
 run_bench cifar_ease "MiN-cifar-10steps${BSUFFIX}" $((gpu++)) "cifar100_ease_20T${BTAG}" &
 
 # ImageNet-R B0-Inc10 (20T)
-if data_ok "imagenetr_ease_20T${BTAG}" "$DATA_ROOT/imagenet-r-split/train" "$DATA_ROOT/imagenet-r-split/test"; then
+if data_ok "imagenetr_ease_20T${BTAG}" "$DATA_ROOT/imagenet-r/train" "$DATA_ROOT/imagenet-r/test"; then
     run_bench imagenetr_ease "MiN-inr-10steps${BSUFFIX}" $((gpu++)) "imagenetr_ease_20T${BTAG}" &
 fi
 
 # ImageNet-A B0-Inc20 (10T)
-if data_ok "imageneta_ease_10T${BTAG}" "$DATA_ROOT/imagenet-a-split/train" "$DATA_ROOT/imagenet-a-split/test"; then
+if data_ok "imageneta_ease_10T${BTAG}" "$DATA_ROOT/imagenet-a/train" "$DATA_ROOT/imagenet-a/test"; then
     run_bench imageneta_ease "MiN-imageneta${BSUFFIX}" $((gpu++)) "imageneta_ease_10T${BTAG}" &
 fi
 

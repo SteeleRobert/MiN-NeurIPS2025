@@ -84,8 +84,8 @@ class iImageNet_A(iData):
     def data_initialization(self):
         data_root = self.args.get('data_root', None)
         if data_root:
-            train_dir = os.path.join(data_root, 'imagenet-a-split', 'train')
-            test_dir = os.path.join(data_root, 'imagenet-a-split', 'test')
+            train_dir = os.path.join(data_root, 'imagenet-a', 'train')
+            test_dir = os.path.join(data_root, 'imagenet-a', 'test')
         else:
             train_dir = r'[DATA PATH]'
             test_dir = r'[DATA PATH]'
@@ -281,8 +281,8 @@ class iImageNet_R(iData):
     def data_initialization(self):
         data_root = self.args.get('data_root', None)
         if data_root:
-            train_dir = os.path.join(data_root, 'imagenet-r-split', 'train')
-            test_dir = os.path.join(data_root, 'imagenet-r-split', 'test')
+            train_dir = os.path.join(data_root, 'imagenet-r', 'train')
+            test_dir = os.path.join(data_root, 'imagenet-r', 'test')
         else:
             train_dir = r'[DATA PATH]'
             test_dir = r'[DATA PATH]'

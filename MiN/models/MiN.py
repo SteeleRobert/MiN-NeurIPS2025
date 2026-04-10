@@ -287,6 +287,10 @@ class MinNet(object):
 
                 optimizer.zero_grad()
                 loss.backward()
+                torch.nn.utils.clip_grad_norm_(
+                    [p for p in self._network.parameters() if p.requires_grad],
+                    max_norm=1.0,
+                )
                 optimizer.step()
                 losses += loss.item()
 

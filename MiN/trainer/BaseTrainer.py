@@ -89,10 +89,8 @@ def _train(args):
     logs_name = "logs/{}/{}/{}_{}/{}".format(args["dataset"], args["model"], args["init_class"], args["increment"],
                                              now_time)
     workdir = os.path.join(logs_name, 'work_dir')
-    if not os.path.exists(logs_name):
-        os.makedirs(logs_name)
-    if not os.path.exists(workdir):
-        os.makedirs(workdir)
+    os.makedirs(logs_name, exist_ok=True)
+    os.makedirs(workdir, exist_ok=True)
     with open(os.path.join(workdir, 'configs.json'), 'w', encoding='utf-8') as json_file:
         json.dump(args, json_file, indent=2)
 

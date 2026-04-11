@@ -10,6 +10,8 @@ def main():
     merged = {**base_param, **model_param}
     if args.data_root is not None:
         merged['data_root'] = args.data_root
+    if args.results_dir is not None:
+        merged['results_dir'] = args.results_dir
     train(merged)
 
 
@@ -27,6 +29,8 @@ def setup_parser():
                         help='Json file of model settings.')
     parser.add_argument('--data_root', type=str, default=None,
                         help='Override data_root from base config.')
+    parser.add_argument('--results_dir', type=str, default=None,
+                        help='Override results output directory (default: ~/qz-compcont-learning/results).')
 
     return parser
 

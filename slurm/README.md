@@ -134,10 +134,84 @@ If your site requires **account** or **QoS**, uncomment and set in the `.slurm` 
 
 ## Outputs and monitoring
 
-- **Slurm stdout/stderr**: `dino-bench-<arrayid>_<taskid>.out` / `.err` in the repository root.
-- **Benchmark logs**: `$LOG_DIR/<benchmark>_<backbone>.log` for each run.
-- **FINAL lines**: `strings <logfile> | grep FINAL` — printed to the task's stdout at completion.
-- **Queue**: `squeue -u "$USER"`
+### Slurm stdout/stderr — repository root
+
+```
+dino-bench-<arrayJobID>_<taskID>.out
+dino-bench-<arrayJobID>_<taskID>.err
+```
+
+One pair per array task (14 pairs total: 2 backbones × 7 benchmarks). These capture the
+preamble (hostname, BACKBONE, DATA_ROOT, LOG_DIR) and the `FINAL:` line grep'd from the
+benchmark log at job exit. They do **not** contain the full training output.
+
+### Benchmark logs — `$LOG_DIR/<tag>.log`
+
+Default location: `$HOME/min_benchmark_logs/<backbone>/`
+
+```
+~/min_benchmark_logs/dinov2_vitb14/cifar100_ease_20T_dinov2_vitb14.log
+~/min_benchmark_logs/dinov2_vitb14/imagenetr_ease_20T_dinov2_vitb14.log
+~/min_benchmark_logs/dinov2_vitb14/imageneta_ease_10T_dinov2_vitb14.log
+~/min_benchmark_logs/dinov2_vitb14/cub200_ease_20T_dinov2_vitb14.log
+~/min_benchmark_logs/dinov2_vitb14/omnibenchmark_ease_10T_dinov2_vitb14.log
+~/min_benchmark_logs/dinov2_vitb14/vtab_ease_5T_dinov2_vitb14.log
+~/min_benchmark_logs/dinov2_vitb14/objectnet_ease_20T_dinov2_vitb14.log
+# same 7 for dinov3_vitb16/
+```
+
+Redirected stdout + stderr from `main.py`. Contains the `Saved:` path confirmation and
+`FINAL: avg_acc=...` line from `_save_compcont_results`. Extract with:
+
+```bash
+strings "$LOG_DIR/cifar100_ease_20T_dinov2_vitb14.log" | grep FINAL
+```
+
+### MiN training logs — `MiN/logs/<dataset>/min/<init>_<inc>/<timestamp>/`
+
+One timestamped directory per run created by the Python `logging` module:
+
+```
+MiN/logs/<dataset>/min/<init>_<inc>/<timestamp>/
+    <dataset>_min_<init>_<inc>_<backbone>.log   # epoch losses, per-task accuracy, FINAL line
+    results.json                                # full structured result (same format as below)
+    work_dir/
+        configs.json                            # merged base + model config for this run
+    Last_check_point.pth                        # final model checkpoint
+```
+
+The `.log` file contains all `logging.info` output: epoch losses, per-task accuracy matrices,
+confusion matrices, and the `Saved:` / `FINAL:` lines written by `_save_compcont_results`.
+`results.json` is an identical copy of the compcont-bench result (see below), kept here so
+each run directory is self-contained.
+
+### compcont-bench result JSON — `~/qz-compcont-learning/results/<benchmark>/`
+
+The primary structured output, written at the end of each run:
+
+```
+~/qz-compcont-learning/results/cifar_100/MiN_dinov2_vitb14.json
+~/qz-compcont-learning/results/imagenet_r/MiN_dinov2_vitb14.json
+~/qz-compcont-learning/results/imagenet_a/MiN_dinov2_vitb14.json
+~/qz-compcont-learning/results/cub_200/MiN_dinov2_vitb14.json
+~/qz-compcont-learning/results/omnibenchmark/MiN_dinov2_vitb14.json
+~/qz-compcont-learning/results/vtab/MiN_dinov2_vitb14.json
+# same 6 for MiN_dinov3_vitb16.json
+# objectnet only written if data is present
+```
+
+Each file contains `label`, `metrics` (avg_acc, avg_inc_acc, bwt, task0_final),
+`task_accs_history` (step → task → accuracy), `seed`, `backbone`, `classifier`, and
+`benchmark` fields — the same schema used by `compcont-bench` results. Compare runs
+directly with `compcont-bench results` from `~/qz-compcont-learning/`.
+
+### Monitoring
+
+```bash
+squeue -u "$USER"                                          # job queue
+strings $HOME/min_benchmark_logs/dinov2_vitb14/*.log | grep FINAL   # all FINAL lines
+compcont-bench results                                     # compare with other methods
+```
 
 ## Files in this directory
 

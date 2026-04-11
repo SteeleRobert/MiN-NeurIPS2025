@@ -46,8 +46,12 @@ def _compute_cil_metrics(task_accs_history):
             'bwt': bwt, 'task0_final': task0_final}
 
 
-def _save_compcont_results(args, task_accs_history):
-    """Save results in compcont-bench JSON format under ~/qz-compcont-learning/results/."""
+def _save_compcont_results(args, task_accs_history, log_dir=None):
+    """Save results in compcont-bench JSON format under ~/qz-compcont-learning/results/.
+
+    Also saves a copy as results.json in log_dir (the per-run log directory) when provided,
+    so each experiment run is self-contained with the full structured result.
+    """
     metrics = _compute_cil_metrics(task_accs_history)
 
     benchmark_key = _DATASET_TO_BENCHMARK.get(args['dataset'], args['dataset'])
@@ -70,17 +74,30 @@ def _save_compcont_results(args, task_accs_history):
         'benchmark': benchmark_key,
     }
 
-    results_root = os.path.join(os.path.expanduser('~'), 'qz-compcont-learning', 'results')
+    default_results_root = os.path.join(os.path.expanduser('~'), 'qz-compcont-learning', 'results')
+    results_root = args.get('results_dir') or default_results_root
     bdir = os.path.join(results_root, benchmark_key)
     os.makedirs(bdir, exist_ok=True)
     path = os.path.join(bdir, 'MiN_{}.json'.format(backbone))
     with open(path, 'w') as f:
         json.dump(result, f, indent=2)
 
-    print('  Saved: {}'.format(path))
-    print('  FINAL: avg_acc={:.1f}%  avg_inc_acc={:.1f}%  bwt={:+.3f}  task0={:.1f}%'.format(
+    if log_dir is not None:
+        log_result_path = os.path.join(log_dir, 'results.json')
+        with open(log_result_path, 'w') as f:
+            json.dump(result, f, indent=2)
+        saved_msg = 'Saved: {} (log copy: {})'.format(path, log_result_path)
+    else:
+        saved_msg = 'Saved: {}'.format(path)
+
+    final_msg = 'FINAL: avg_acc={:.1f}%  avg_inc_acc={:.1f}%  bwt={:+.3f}  task0={:.1f}%'.format(
         metrics['avg_acc'] * 100, metrics['avg_inc_acc'] * 100,
-        metrics['bwt'], metrics['task0_final'] * 100))
+        metrics['bwt'], metrics['task0_final'] * 100)
+
+    print('  ' + saved_msg)
+    print('  ' + final_msg)
+    logging.info(saved_msg)
+    logging.info(final_msg)
     return path
 
 
@@ -145,7 +162,7 @@ def _train(args):
     model.save_check_point(save_path)
 
     if task_accs_history:
-        _save_compcont_results(args, task_accs_history)
+        _save_compcont_results(args, task_accs_history, log_dir=logs_name)
 
 
 def _set_device(args):

@@ -70,7 +70,10 @@ def _save_compcont_results(args, task_accs_history):
         'benchmark': benchmark_key,
     }
 
-    results_root = os.path.join(os.path.expanduser('~'), 'qz-compcont-learning', 'results')
+    results_root = os.environ.get(
+        'COMPCONT_RESULTS_DIR',
+        os.path.join(os.path.expanduser('~'), 'qz-compcont-learning', 'results'),
+    )
     bdir = os.path.join(results_root, benchmark_key)
     os.makedirs(bdir, exist_ok=True)
     path = os.path.join(bdir, 'MiN_{}.json'.format(backbone))

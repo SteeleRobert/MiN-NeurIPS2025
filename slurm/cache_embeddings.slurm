@@ -51,6 +51,11 @@ set -euo pipefail
 
 : "${BACKBONE:?Set BACKBONE, e.g. sbatch --export=ALL,BACKBONE=dinov2_vitb14 slurm/cache_embeddings.slurm}"
 
+# ── Slack notifications ───────────────────────────────────────────────────────
+# Resolved after REPO_ROOT is validated; functions are no-ops if webhook not set.
+# Configure via: export SLACK_WEBHOOK_URL='https://hooks.slack.com/services/...'
+# or:            echo 'https://...' > slurm/.slack_webhook_url
+
 case "$BACKBONE" in
     pretrained_vit_b16_224_in21k_min|dinov2_vitb14|dinov3_vitb16) ;;
     *)
@@ -67,6 +72,9 @@ if [[ -z "$REPO_ROOT" || ! -f "$REPO_ROOT/run_benchmarks.sh" ]]; then
     exit 1
 fi
 cd "$REPO_ROOT"
+
+# shellcheck source=slack_notify.sh
+source "$REPO_ROOT/slurm/slack_notify.sh"
 
 if [[ ! -x .venv/bin/python ]]; then
     echo "Missing .venv — run: uv sync && source .venv/bin/activate (on a login node)"
@@ -100,6 +108,41 @@ MODEL_CFG="${BENCH_MODEL[$IDX]}${BSUFFIX}"
 TAG="${BENCH_TAG[$IDX]}_${BACKBONE}"
 TRAIN_DIR="${BENCH_TRAIN[$IDX]}"
 TEST_DIR="${BENCH_TEST[$IDX]}"
+
+# Resolve dataset key from the base config (e.g. "imagenetr") — needed for
+# the output path in Slack notifications.
+DATASET_KEY="$(.venv/bin/python -c "
+import json
+with open('$CONFIGS/base_configs/${BASE_CFG}.json') as f:
+    print(json.load(f)['dataset'])
+" 2>/dev/null || echo "")"
+
+EMBED_PATH="$EMBED_DIR/${DATASET_KEY}/$BACKBONE"
+
+# Stderr file written by SLURM for this array task — used in failure messages.
+_STDERR_FILE="${SLURM_SUBMIT_DIR:-.}/embed-cache-${SLURM_ARRAY_JOB_ID:-${SLURM_JOB_ID:-X}}_${SLURM_ARRAY_TASK_ID:-0}.err"
+
+# EXIT trap: fires on any early exit (bad BACKBONE, missing data, etc.).
+# Successful paths call min_slack_notify explicitly and clear the trap.
+_exit_rc=0
+_slack_on_exit_failure() {
+    local rc="${1:-$_exit_rc}"
+    [[ $rc -eq 0 ]] && return 0
+    local detail=""
+    if [[ -f "$_STDERR_FILE" && -s "$_STDERR_FILE" ]]; then
+        detail="$(python3 -c "
+import re, sys
+text = open('$_STDERR_FILE', errors='replace').read()
+idx = text.rfind('Traceback (most recent call last)')
+if idx != -1:
+    sys.stdout.write(text[idx:idx+3000])
+else:
+    sys.stdout.write('\n'.join(text.splitlines()[-60:]))
+" 2>/dev/null || tail -60 "$_STDERR_FILE" 2>/dev/null || true)"
+    fi
+    min_slack_notify "FAILED (exit ${rc}) — $TAG" "$detail"
+}
+trap '_slack_on_exit_failure $?' EXIT
 
 echo "=== MiN embedding cache [array task $IDX] ==="
 echo "Host:       $(hostname)"
@@ -145,17 +188,22 @@ set -e
 
 echo "[$TAG] Done (exit $cache_rc)."
 
-# ── Print summary of cached files ─────────────────────────────────────────────
-dataset_key=$(python3 -c "
-import json
-with open('$CONFIGS/base_configs/${BASE_CFG}.json') as f:
-    print(json.load(f)['dataset'])
-" 2>/dev/null || true)
-
-if [[ -n "$dataset_key" && -d "$EMBED_DIR/$dataset_key/$BACKBONE" ]]; then
-    echo ""
-    echo "Cached embeddings:"
-    ls -lh "$EMBED_DIR/$dataset_key/$BACKBONE/"*.npz 2>/dev/null || echo "  (none found)"
+# ── Notify ─────────────────────────────────────────────────────────────────────
+if [[ $cache_rc -eq 0 ]]; then
+    # Build file list for the success message.
+    npz_files=""
+    if [[ -d "$EMBED_PATH" ]]; then
+        npz_files="$(ls -1 "$EMBED_PATH/"*.npz 2>/dev/null | xargs -I{} basename {} | tr '\n' '  ' || true)"
+        echo ""
+        echo "Cached embeddings ($EMBED_PATH):"
+        ls -lh "$EMBED_PATH/"*.npz 2>/dev/null || echo "  (none found)"
+    fi
+    detail="Path: ${EMBED_PATH}/"
+    [[ -n "$npz_files" ]] && detail+=$'\n'"Files: ${npz_files}"
+    # Disarm the EXIT trap before the explicit success call.
+    trap - EXIT
+    min_slack_notify "finished OK — $TAG" "$detail"
+else
+    # Let the EXIT trap handle the failure notification.
+    exit "$cache_rc"
 fi
-
-[[ $cache_rc -eq 0 ]] || exit "$cache_rc"

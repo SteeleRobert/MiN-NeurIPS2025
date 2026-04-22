@@ -24,6 +24,9 @@ def get_pretrained_backbone(args):
     elif name.startswith('dinov3_'):
         from backbones.dino_backbone import load_dinov3_min
         model = load_dinov3_min(name, hidden_dim)
+    elif name.startswith('siglip2_'):
+        from backbones.siglip_backbone import load_siglip2_min
+        model = load_siglip2_min(name, hidden_dim)
     else:
         raise ValueError(f"Unknown backbone_type: '{name}'")
 

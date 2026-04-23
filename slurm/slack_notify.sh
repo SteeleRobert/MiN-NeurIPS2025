@@ -94,8 +94,12 @@ log_dir = os.environ.get("LOG_DIR", "")
 stderr_paths = []
 if submit and jid:
     if ajid and atid not in (None, ""):
-        stderr_paths.append(os.path.join(submit, f"dino-bench-{ajid}_{atid}.err"))
-    stderr_paths.append(os.path.join(submit, f"dino-bench-{jid}.err"))
+        for prefix in ("unlearn", "min-unlearn", "dino-bench", "min-dino-array"):
+            stderr_paths.append(os.path.join(submit, f"slurm/logs/{prefix}_{ajid}_{atid}.err"))
+            stderr_paths.append(os.path.join(submit, f"{prefix}-{ajid}_{atid}.err"))
+    for prefix in ("unlearn", "min-unlearn", "dino-bench", "min-dino-array"):
+        stderr_paths.append(os.path.join(submit, f"slurm/logs/{prefix}_{jid}.err"))
+        stderr_paths.append(os.path.join(submit, f"{prefix}-{jid}.err"))
 
 raw = ""
 label = ""

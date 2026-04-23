@@ -133,7 +133,7 @@ TEST_SUBDIR="${BENCH_TEST[$BENCH_IDX]}"
 MODEL_CFG="${MODEL_CFG_STEM}${BSUFFIX}"
 
 # ── Paths ─────────────────────────────────────────────────────────────────────
-DATA_ROOT="${DATA_ROOT:-$HOME/qz-compcont-learning/data}"
+DATA_ROOT="${DATA_ROOT:-/gpfs/data/oermannlab/public_data/continual_learning}"
 LOG_DIR="${LOG_DIR:-$HOME/min_unlearn_logs}"
 OUT_DIR="${OUT_DIR:-$HOME/min_unlearn_results}/${TAG}"
 CKPT_DIR="${CKPT_DIR:-}"   # set to re-use saved checkpoints (skip training)

@@ -2,3 +2,6 @@ logs/
 infrastructure.md
 slurm/.slack_webhook_url
 ~/run_imagenet_dino.sh
+__pycache__/
+*.pyc
+*.pyo

@@ -11,7 +11,7 @@
 #
 # Within each backbone block, bench index = task_id % 6:
 #   0: CIFAR-100      B0-Inc5  (20T)
-#   1: ImageNet-R     B0-Inc10 (20T)
+#   1: ImageNet-R     B0-Inc5  (40T)
 #   2: ImageNet-A     B0-Inc20 (10T)
 #   3: CUB-200        B0-Inc10 (20T)
 #   4: OmniBenchmark  B0-Inc30 (10T)
@@ -117,9 +117,9 @@ BTAG="${BTAGS[$BACKBONE_IDX]}"
 
 # ── Benchmark table (index 0–5) ───────────────────────────────────────────────
 # TRAIN/TEST_SUBDIR: relative to DATA_ROOT; empty = auto-downloaded (CIFAR).
-BENCH_BASE=(  cifar_ease        imagenetr_ease         imageneta_ease         cub_ease              omnibenchmark_ease       vtab_ease       )
+BENCH_BASE=(  cifar_ease        imagenetr_ease_40T     imageneta_ease         cub_ease              omnibenchmark_ease       vtab_ease       )
 BENCH_MODEL=( MiN-cifar-10steps MiN-inr-10steps        MiN-imageneta          MiN-cub-10steps       MiN-omni-10steps         MiN-vtab-5steps )
-BENCH_TAG=(   cifar100_20T      imagenetr_20T          imageneta_10T          cub200_20T            omnibenchmark_10T        vtab_5T         )
+BENCH_TAG=(   cifar100_20T      imagenetr_40T          imageneta_10T          cub200_20T            omnibenchmark_10T        vtab_5T         )
 BENCH_TRAIN=( ""                imagenet-r/train       imagenet-a/train       cub/train             omnibenchmark/train      vtab/train      )
 BENCH_TEST=(  ""                imagenet-r/test        imagenet-a/test        cub/test              omnibenchmark/test       vtab/test       )
 

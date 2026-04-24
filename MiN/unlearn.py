@@ -505,7 +505,7 @@ def train_and_return(args: dict) -> Tuple[MinNet, DataManger]:
     """Run the full MiN training pipeline and return the trained model in memory."""
     _set_random(args.get("seed", 1993))
     datamanger = DataManger(args["dataset"], args["device"], args)
-    model: MinNet = get_model(args, logging)
+    model: MinNet = get_model(args, logging.getLogger(__name__))
     model.init_train(data_manger=datamanger)
     for _ in range(datamanger.task_size):
         model.increment_train(data_manger=datamanger)
@@ -822,7 +822,7 @@ def main() -> None:
     if cli.checkpoint:
         logging.info("Loading model from checkpoint: %s", cli.checkpoint)
         datamanger = DataManger(args["dataset"], args["device"], args)
-        model: MinNet = get_model(args, logging)
+        model: MinNet = get_model(args, logging.getLogger(__name__))
         total_tasks = datamanger.task_size + 1
         for t in range(total_tasks):
             nb = args["init_class"] if t == 0 else args["increment"]

@@ -732,7 +732,7 @@ def print_all_tasks_summary(per_task_results: Dict[int, Dict]) -> None:
         row = f"  {t:>3}  "
         for m in methods:
             bwt = res.get(m, {}).get("bwt")
-            row += f"  {(bwt or 0.0):>{col}+.4f}"
+            row += f"  {(bwt or 0.0):+{col}.4f}"
         print(row)
     print("═" * len(header))
 

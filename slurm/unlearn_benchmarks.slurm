@@ -232,7 +232,9 @@ echo ""
 echo "=== Finished: $(date -Is) (exit ${run_rc}) ==="
 
 # Extract summary lines for Slack.
-summary=$(strings "$LOG" | grep -E 'FINAL:|Forgotten|Mean retained|BWT' | tail -10 || true)
+# Matches: FINAL: lines, task labels, interpretation block (Forgotten/Collateral),
+# table header (Method/Mean retained/BWT), table data rows (Baseline/A1/A2/A3).
+summary=$(strings "$LOG" | grep -E 'FINAL:|Task to forget|Forgotten|Mean retained|BWT|Baseline|A[123][ :—]' | tail -40 || true)
 
 if [[ $run_rc -eq 0 ]]; then
     min_slack_notify "*min-unlearn* [${TAG}] backbone=${BACKBONE} — finished OK

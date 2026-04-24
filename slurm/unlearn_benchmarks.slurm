@@ -120,8 +120,8 @@ BTAG="${BTAGS[$BACKBONE_IDX]}"
 BENCH_BASE=(  cifar_ease        imagenetr_ease         imageneta_ease         cub_ease              omnibenchmark_ease       vtab_ease       )
 BENCH_MODEL=( MiN-cifar-10steps MiN-inr-10steps        MiN-imageneta          MiN-cub-10steps       MiN-omni-10steps         MiN-vtab-5steps )
 BENCH_TAG=(   cifar100_20T      imagenetr_20T          imageneta_10T          cub200_20T            omnibenchmark_10T        vtab_5T         )
-BENCH_TRAIN=( ""                imagenet-r-split/train imagenet-a-split/train cub/train             omnibenchmark/train      vtab/train      )
-BENCH_TEST=(  ""                imagenet-r-split/test  imagenet-a-split/test  cub/test              omnibenchmark/test       vtab/test       )
+BENCH_TRAIN=( ""                imagenet-r/train       imagenet-a/train       cub/train             omnibenchmark/train      vtab/train      )
+BENCH_TEST=(  ""                imagenet-r/test        imagenet-a/test        cub/test              omnibenchmark/test       vtab/test       )
 
 BASE_CFG="${BENCH_BASE[$BENCH_IDX]}"
 MODEL_CFG_STEM="${BENCH_MODEL[$BENCH_IDX]}"

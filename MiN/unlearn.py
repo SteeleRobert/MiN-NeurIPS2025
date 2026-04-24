@@ -555,7 +555,7 @@ def run_unlearning_experiments(
 
     # Baseline.
     logging.info("Evaluating baseline …")
-    baseline = _eval(model, run_feature_probe=run_feature_probe)
+    baseline = _eval(model, probe=run_feature_probe)
     baseline_retained = baseline["retained_accuracy"]
 
     # A1.

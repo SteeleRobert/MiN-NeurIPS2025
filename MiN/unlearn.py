@@ -123,6 +123,27 @@ class _WdsTaskDataset(Dataset):
         return pos, self.transform(image), int(self.labels[pos])
 
 
+class _WdsTrainTaskDataset(Dataset):
+    """Per-task WDS training dataset with category-space labels.
+
+    Labels stay in category-space so MiN's cat2order() can remap them after
+    get_task_data() returns, matching DataManger.get_task_data(source='train').
+    """
+
+    def __init__(self, wds_train, indices: List[int], labels: np.ndarray, trsf):
+        self.wds_train = wds_train
+        self.indices = indices
+        self.labels = labels  # cat-space; reassigned to order-space by MiN
+        self.trsf = trsf
+
+    def __len__(self):
+        return len(self.indices)
+
+    def __getitem__(self, pos: int):
+        image = self.wds_train.get_pil_image(self.indices[pos])
+        return pos, self.trsf(image), int(self.labels[pos])
+
+
 def _find_wds_dir(args: dict) -> Optional[str]:
     """Return the wds directory for this benchmark if it exists, else None."""
     data_root = args.get("data_root", "")
@@ -185,6 +206,71 @@ def _build_wds_per_task_test_loaders(
             num_workers=args.get("num_workers", 4),
         )
     return loaders
+
+
+class _WdsBackedDataManger:
+    """DataManger wrapper that serves training data from WDS shards.
+
+    All metadata methods (get_task_list, map_*, task_size, category_index, …)
+    delegate to the underlying DataManger.  Only get_task_data for train /
+    train_no_aug is intercepted to read from WDS instead of disk image files.
+    """
+
+    def __init__(self, dm: DataManger, wds_train):
+        self._dm = dm
+        self._wds_train = wds_train
+
+        # wds_class_id → cat_id via class name string.
+        wds_cls_to_cat: Dict[int, int] = {}
+        cat_names = list(dm.category_index)
+        for wds_cid, cls_name in enumerate(wds_train.classes):
+            try:
+                wds_cls_to_cat[wds_cid] = cat_names.index(cls_name)
+            except ValueError:
+                pass
+
+        # cat_id → list of WDS sample indices.
+        self._cat_to_wds_indices: Dict[int, List[int]] = {}
+        for i, wds_lbl in enumerate(wds_train.targets):
+            cat_id = wds_cls_to_cat.get(wds_lbl)
+            if cat_id is not None:
+                self._cat_to_wds_indices.setdefault(cat_id, []).append(i)
+
+    def __getattr__(self, name):
+        return getattr(self._dm, name)
+
+    def get_task_data(self, source: str, class_list: list):
+        if source in ("train", "train_no_aug"):
+            trsf = self._dm.train_trsf if source == "train" else self._dm.test_trsf
+            indices: List[int] = []
+            labels: List[int] = []
+            for cat_id in class_list:
+                for idx in self._cat_to_wds_indices.get(cat_id, []):
+                    indices.append(idx)
+                    labels.append(cat_id)
+            if not indices:
+                raise ValueError(
+                    f"WDS train: no samples found for class_list={class_list!r}"
+                )
+            return _WdsTrainTaskDataset(
+                self._wds_train, indices,
+                np.array(labels, dtype=np.int64), trsf,
+            )
+        return self._dm.get_task_data(source, class_list)
+
+
+def _wrap_datamanger_with_wds_train(dm: DataManger, wds_dir: str) -> _WdsBackedDataManger:
+    """Return a DataManger wrapper that serves train data from WDS shards."""
+    if _QZ_SRC not in sys.path:
+        sys.path.insert(0, _QZ_SRC)
+    from kanerva_sdm.data.wds_loader import WdsDataset  # type: ignore
+
+    wds_train = WdsDataset(wds_dir, "train", transform=None)
+    logging.info(
+        "WDS train loader: %d samples, %d classes from %s",
+        len(wds_train), len(wds_train.classes), wds_dir,
+    )
+    return _WdsBackedDataManger(dm, wds_train)
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -626,10 +712,15 @@ def save_plots(
 # Training loop
 # ─────────────────────────────────────────────────────────────────────────────
 
-def train_and_return(args: dict) -> Tuple[MinNet, DataManger]:
+def train_and_return(
+    args: dict, wds_dir: Optional[str] = None
+) -> Tuple[MinNet, DataManger]:
     """Run the full MiN training pipeline and return the trained model in memory."""
     _set_random(args.get("seed", 1993))
     datamanger = DataManger(args["dataset"], args["device"], args)
+    if wds_dir is not None:
+        logging.info("Using WDS train data from %s", wds_dir)
+        datamanger = _wrap_datamanger_with_wds_train(datamanger, wds_dir)
     model: MinNet = get_model(args, logging.getLogger(__name__))
     model.init_train(data_manger=datamanger)
     for _ in range(datamanger.task_size):
@@ -947,6 +1038,13 @@ def main() -> None:
 
     out_dir = cli.output_dir or os.path.join(_HERE, "logs", "unlearn")
 
+    # ── Resolve wds directory (used for both train and test loaders) ──────────
+    wds_dir = cli.wds_dir or _find_wds_dir(args)
+    if wds_dir:
+        logging.info("WebDataset shards → %s", wds_dir)
+    else:
+        logging.info("WebDataset not found; using DataManger for data loading")
+
     # ── Train or load ──────────────────────────────────────────────────────────
     if cli.checkpoint:
         logging.info("Loading model from checkpoint: %s", cli.checkpoint)
@@ -963,18 +1061,11 @@ def main() -> None:
         load_unlearn_checkpoint(model, cli.checkpoint)
     else:
         logging.info("Training model from scratch …")
-        model, datamanger = train_and_return(args)
+        model, datamanger = train_and_return(args, wds_dir=wds_dir)
 
     if cli.save_checkpoint:
         os.makedirs(out_dir, exist_ok=True)
         save_unlearn_checkpoint(model, os.path.join(out_dir, "trained_model.pt"))
-
-    # ── Resolve wds directory (explicit flag or auto-detect) ──────────────────
-    wds_dir = cli.wds_dir or _find_wds_dir(args)
-    if wds_dir:
-        logging.info("WebDataset test loaders → %s", wds_dir)
-    else:
-        logging.info("WebDataset not found; using DataManger for test loaders")
 
     # ── Run experiments ────────────────────────────────────────────────────────
     if cli.all_tasks:

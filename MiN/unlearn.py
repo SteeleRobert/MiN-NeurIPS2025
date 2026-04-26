@@ -32,6 +32,20 @@ import os
 _HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, _HERE)
 
+# Path to qz-compcont-learning's kanerva_sdm package (WdsDataset lives there).
+_QZ_SRC = os.path.normpath(os.path.join(_HERE, "..", "..", "qz-compcont-learning", "src"))
+
+# Map MiN dataset name → wds sub-directory name (under data_root/wds/).
+_WDS_SUBDIR: dict = {
+    "cifar224":      "cifar_100",
+    "imagenetr":     "imagenet_r",
+    "imageneta":     "imagenet_a",
+    "cub":           "cub_200",
+    "omnibenchmark": "omnibenchmark",
+    "vtab":          "vtab",
+    "objectnet":     "objectnet",
+}
+
 import argparse
 import copy
 import datetime
@@ -41,15 +55,24 @@ from typing import Dict, List, Optional, Tuple
 
 import numpy as np
 import torch
-from torch.utils.data import DataLoader
+from torch.utils.data import DataLoader, Dataset
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
+from torchvision import transforms as T
 from data_process.data_manger import DataManger
 from models.MiN import MinNet
 from utils.factory import get_model
 from trainer.BaseTrainer import _set_device, _set_random
+
+# MiN test-time transform (matches trainer/data pipeline).
+_MIN_TEST_TRSF = T.Compose([
+    T.Resize(256, interpolation=3),
+    T.CenterCrop(224),
+    T.ToTensor(),
+    T.Normalize(mean=(0.5, 0.5, 0.5), std=(0.5, 0.5, 0.5)),
+])
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -70,6 +93,98 @@ def _zero_and_renorm(wn: torch.Tensor, idx: int) -> torch.Tensor:
     wn[idx] = 0.0
     s = wn.sum()
     return wn / s if s > 1e-8 else wn
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# WebDataset helpers
+# ─────────────────────────────────────────────────────────────────────────────
+
+class _WdsTaskDataset(Dataset):
+    """Per-task subset of a WdsDataset returning (pos, image, order_label) 3-tuples.
+
+    Labels are remapped from wds class IDs to MiN order-space indices via
+    `wds_to_order`, which accounts for the alphabetical-vs-os.listdir class
+    ordering difference between the two pipelines.
+    """
+
+    def __init__(self, wds_test, indices: List[int], wds_to_order: dict, transform):
+        self.wds_test = wds_test
+        self.indices = indices
+        self.transform = transform
+        self.labels = np.array(
+            [wds_to_order[wds_test.targets[i]] for i in indices], dtype=np.int64
+        )
+
+    def __len__(self):
+        return len(self.indices)
+
+    def __getitem__(self, pos: int):
+        image = self.wds_test.get_pil_image(self.indices[pos])
+        return pos, self.transform(image), int(self.labels[pos])
+
+
+def _find_wds_dir(args: dict) -> Optional[str]:
+    """Return the wds directory for this benchmark if it exists, else None."""
+    data_root = args.get("data_root", "")
+    subdir = _WDS_SUBDIR.get(args.get("dataset", ""))
+    if not subdir:
+        return None
+    wds_dir = os.path.join(data_root, "wds", subdir)
+    return wds_dir if os.path.isfile(os.path.join(wds_dir, "test_metadata.json")) else None
+
+
+def _build_wds_per_task_test_loaders(
+    wds_dir: str,
+    datamanger: DataManger,
+    args: dict,
+    num_tasks: int,
+) -> Dict[int, DataLoader]:
+    """Build per-task test loaders from WebDataset shards.
+
+    Bridges the class-naming difference: wds uses alphabetically sorted class
+    names while MiN's split_img_label uses os.listdir order.  The translation
+    goes through the class name string, which is stable across both pipelines.
+    """
+    if _QZ_SRC not in sys.path:
+        sys.path.insert(0, _QZ_SRC)
+    from kanerva_sdm.data.wds_loader import WdsDataset  # type: ignore
+
+    logging.info("Using WebDataset test data from %s", wds_dir)
+    wds_test = WdsDataset(wds_dir, "test", transform=None)
+
+    # Build per-wds-class sample index.
+    by_wds_class: Dict[int, List[int]] = {}
+    for i, lbl in enumerate(wds_test.targets):
+        by_wds_class.setdefault(lbl, []).append(i)
+
+    # Build wds_class_id → order-space mapping via class name.
+    # datamanger.category_index[min_class_id] == class name for all dataset types.
+    wds_to_order: Dict[int, int] = {}
+    for wds_cid, cls_name in enumerate(wds_test.classes):
+        try:
+            min_cid = list(datamanger.category_index).index(cls_name)
+            wds_to_order[wds_cid] = datamanger.map_cat2order(min_cid)
+        except (ValueError, KeyError):
+            pass  # class absent from this datamanger's class_order
+
+    loaders: Dict[int, DataLoader] = {}
+    for t in range(num_tasks):
+        train_list, _, _ = datamanger.get_task_list(t)
+        # Convert MiN class IDs to wds sample indices via class name lookup.
+        indices: List[int] = []
+        for min_cid in train_list:
+            cls_name = datamanger.map_cat2cat_name(min_cid)
+            wds_cid = wds_test.class_to_idx.get(cls_name)
+            if wds_cid is not None:
+                indices.extend(by_wds_class.get(wds_cid, []))
+        ds = _WdsTaskDataset(wds_test, indices, wds_to_order, _MIN_TEST_TRSF)
+        loaders[t] = DataLoader(
+            ds,
+            batch_size=args.get("init_batch_size", 64),
+            shuffle=False,
+            num_workers=args.get("num_workers", 4),
+        )
+    return loaders
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -197,14 +312,24 @@ def load_unlearn_checkpoint(model: MinNet, path: str) -> MinNet:
 # ─────────────────────────────────────────────────────────────────────────────
 
 def build_per_task_test_loaders(
-    datamanger: DataManger, args: dict, num_tasks: int
+    datamanger: DataManger,
+    args: dict,
+    num_tasks: int,
+    wds_dir: Optional[str] = None,
 ) -> Dict[int, DataLoader]:
-    """
-    Build one DataLoader per task containing only that task's own classes.
+    """Build one DataLoader per task containing only that task's own classes.
 
     Labels are remapped to order-space (0 … total_classes-1) to match
     what the model's analytic classifier produces.
+
+    When `wds_dir` is provided (or auto-detected via args["data_root"] +
+    the dataset name), the loaders are built from WebDataset shards instead
+    of the MiN DataManger, avoiding the slow parallel image-loading path.
     """
+    resolved_wds = wds_dir or _find_wds_dir(args)
+    if resolved_wds is not None:
+        return _build_wds_per_task_test_loaders(resolved_wds, datamanger, args, num_tasks)
+
     loaders: Dict[int, DataLoader] = {}
     for t in range(num_tasks):
         train_list, _, _ = datamanger.get_task_list(t)
@@ -523,6 +648,7 @@ def run_unlearning_experiments(
     task_to_forget: int,
     output_dir: str,
     run_feature_probe: bool = True,
+    wds_dir: Optional[str] = None,
 ) -> Dict:
     """
     Run baseline + A1/A2/A3 ablations and return all results as a dict.
@@ -547,7 +673,7 @@ def run_unlearning_experiments(
         task_to_forget, forgotten_classes, total_tasks,
     )
 
-    test_loaders = build_per_task_test_loaders(datamanger, args, total_tasks)
+    test_loaders = build_per_task_test_loaders(datamanger, args, total_tasks, wds_dir=wds_dir)
 
     def _eval(m: MinNet, baseline_ret=None, probe=False) -> Dict:
         ev = UnlearningEvaluator(m, test_loaders, task_to_forget, retained_tasks, device)
@@ -787,6 +913,9 @@ def parse_args() -> argparse.Namespace:
                    help="Skip the linear separability probe (saves time)")
     p.add_argument("--data_root",       default=None,
                    help="Override data_root from base config")
+    p.add_argument("--wds_dir",         default=None,
+                   help="Explicit path to WebDataset shards for test loaders. "
+                        "If omitted, auto-detected from data_root/wds/<dataset>/.")
     return p.parse_args()
 
 
@@ -840,6 +969,13 @@ def main() -> None:
         os.makedirs(out_dir, exist_ok=True)
         save_unlearn_checkpoint(model, os.path.join(out_dir, "trained_model.pt"))
 
+    # ── Resolve wds directory (explicit flag or auto-detect) ──────────────────
+    wds_dir = cli.wds_dir or _find_wds_dir(args)
+    if wds_dir:
+        logging.info("WebDataset test loaders → %s", wds_dir)
+    else:
+        logging.info("WebDataset not found; using DataManger for test loaders")
+
     # ── Run experiments ────────────────────────────────────────────────────────
     if cli.all_tasks:
         total_tasks = datamanger.task_size + 1
@@ -855,6 +991,7 @@ def main() -> None:
                 task_to_forget=t,
                 output_dir=task_dir,
                 run_feature_probe=not cli.no_feature_probe,
+                wds_dir=wds_dir,
             )
         print_all_tasks_summary(per_task_results)
         save_all_tasks_plot(per_task_results, out_dir)
@@ -872,6 +1009,7 @@ def main() -> None:
             task_to_forget=cli.task_to_forget,
             output_dir=out_dir,
             run_feature_probe=not cli.no_feature_probe,
+            wds_dir=wds_dir,
         )
 
 

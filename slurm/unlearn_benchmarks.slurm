@@ -38,6 +38,9 @@
 # Override data root:
 #   sbatch --export=ALL,DATA_ROOT=/gpfs/data/oermannlab/... slurm/unlearn_benchmarks.slurm
 #
+# Override WebDataset base (default: DATA_ROOT/webdatasets):
+#   sbatch --export=ALL,WDS_BASE=/path/to/webdatasets slurm/unlearn_benchmarks.slurm
+#
 # Slack notifications (optional):
 #   export SLACK_WEBHOOK_URL=https://hooks.slack.com/services/...
 #   or:  echo 'https://...' > slurm/.slack_webhook_url
@@ -117,23 +120,27 @@ BTAG="${BTAGS[$BACKBONE_IDX]}"
 
 # ── Benchmark table (index 0–5) ───────────────────────────────────────────────
 # TRAIN/TEST_SUBDIR: relative to DATA_ROOT; empty = auto-downloaded (CIFAR).
+# WDS_SUBDIR: subdirectory name under WDS_BASE; matches _WDS_SUBDIR in unlearn.py.
 BENCH_BASE=(  cifar_ease        imagenetr_ease_40T     imageneta_ease         cub_ease              omnibenchmark_ease       vtab_ease       )
 BENCH_MODEL=( MiN-cifar-10steps MiN-inr-10steps        MiN-imageneta          MiN-cub-10steps       MiN-omni-10steps         MiN-vtab-5steps )
 BENCH_TAG=(   cifar100_20T      imagenetr_40T          imageneta_10T          cub200_20T            omnibenchmark_10T        vtab_5T         )
 BENCH_TRAIN=( ""                imagenet-r/train       imagenet-a/train       cub/train             omnibenchmark/train      vtab/train      )
 BENCH_TEST=(  ""                imagenet-r/test        imagenet-a/test        cub/test              omnibenchmark/test       vtab/test       )
+BENCH_WDS=(   cifar_100         imagenet_r             imagenet_a             cub_200               omnibenchmark            vtab            )
 
 BASE_CFG="${BENCH_BASE[$BENCH_IDX]}"
 MODEL_CFG_STEM="${BENCH_MODEL[$BENCH_IDX]}"
 TAG="${BENCH_TAG[$BENCH_IDX]}${BTAG}"
 TRAIN_SUBDIR="${BENCH_TRAIN[$BENCH_IDX]}"
 TEST_SUBDIR="${BENCH_TEST[$BENCH_IDX]}"
+WDS_SUBDIR="${BENCH_WDS[$BENCH_IDX]}"
 
 # Append backbone suffix to model config name (empty for default backbone).
 MODEL_CFG="${MODEL_CFG_STEM}${BSUFFIX}"
 
 # ── Paths ─────────────────────────────────────────────────────────────────────
 DATA_ROOT="${DATA_ROOT:-/gpfs/data/oermannlab/public_data/continual_learning}"
+WDS_BASE="${WDS_BASE:-/gpfs/data/oermannlab/public_data/continual_learning/webdatasets}"
 LOG_DIR="${LOG_DIR:-$HOME/min_unlearn_logs}"
 OUT_DIR="${OUT_DIR:-$HOME/min_unlearn_results}/${TAG}"
 CKPT_DIR="${CKPT_DIR:-}"   # set to re-use saved checkpoints (skip training)
@@ -152,6 +159,7 @@ echo "Backbone:   ${BACKBONE}"
 echo "Base cfg:   ${BASE_CFG}.json"
 echo "Model cfg:  ${MODEL_CFG}.json"
 echo "Data root:  ${DATA_ROOT}"
+echo "WDS base:   ${WDS_BASE}"
 echo "Output dir: ${OUT_DIR}"
 echo "Log:        ${LOG}"
 echo "GPU:        ${CUDA_VISIBLE_DEVICES:-assigned by SLURM}"
@@ -212,6 +220,15 @@ UNLEARN_CMD+=" --all_tasks"
 UNLEARN_CMD+=" --save_checkpoint"
 UNLEARN_CMD+=" --output_dir    $OUT_DIR"
 UNLEARN_CMD+=" --data_root     $DATA_ROOT"
+
+# Pass WebDataset dir if the shards are present (avoids slow DataManger loading).
+WDS_DIR="${WDS_BASE}/${WDS_SUBDIR}"
+if [[ -f "${WDS_DIR}/test_metadata.json" ]]; then
+    echo "[${TAG}] WebDataset found at ${WDS_DIR} — using wds test loaders"
+    UNLEARN_CMD+=" --wds_dir ${WDS_DIR}"
+else
+    echo "[${TAG}] WebDataset not found at ${WDS_DIR} — falling back to DataManger"
+fi
 
 # Re-use saved checkpoint to skip retraining (useful for reruns).
 if [[ -n "$CKPT_DIR" && -f "$CKPT_DIR/${TAG}/trained_model.pt" ]]; then

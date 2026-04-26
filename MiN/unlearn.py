@@ -209,68 +209,88 @@ def _build_wds_per_task_test_loaders(
 
 
 class _WdsBackedDataManger:
-    """DataManger wrapper that serves training data from WDS shards.
+    """DataManger wrapper that serves train and test data from WDS shards.
 
     All metadata methods (get_task_list, map_*, task_size, category_index, …)
-    delegate to the underlying DataManger.  Only get_task_data for train /
-    train_no_aug is intercepted to read from WDS instead of disk image files.
+    delegate to the underlying DataManger.  get_task_data for train /
+    train_no_aug / test is intercepted to read from WDS instead of disk files.
     """
 
-    def __init__(self, dm: DataManger, wds_train):
+    def __init__(self, dm: DataManger, wds_train, wds_test):
         self._dm = dm
         self._wds_train = wds_train
+        self._wds_test = wds_test
 
-        # wds_class_id → cat_id via class name string.
-        wds_cls_to_cat: Dict[int, int] = {}
         cat_names = list(dm.category_index)
-        for wds_cid, cls_name in enumerate(wds_train.classes):
-            try:
-                wds_cls_to_cat[wds_cid] = cat_names.index(cls_name)
-            except ValueError:
-                pass
 
-        # cat_id → list of WDS sample indices.
-        self._cat_to_wds_indices: Dict[int, List[int]] = {}
-        for i, wds_lbl in enumerate(wds_train.targets):
-            cat_id = wds_cls_to_cat.get(wds_lbl)
-            if cat_id is not None:
-                self._cat_to_wds_indices.setdefault(cat_id, []).append(i)
+        def _build_cat_index(wds_dataset) -> Dict[int, List[int]]:
+            wds_cls_to_cat: Dict[int, int] = {}
+            for wds_cid, cls_name in enumerate(wds_dataset.classes):
+                try:
+                    wds_cls_to_cat[wds_cid] = cat_names.index(cls_name)
+                except ValueError:
+                    pass
+            cat_to_indices: Dict[int, List[int]] = {}
+            for i, wds_lbl in enumerate(wds_dataset.targets):
+                cat_id = wds_cls_to_cat.get(wds_lbl)
+                if cat_id is not None:
+                    cat_to_indices.setdefault(cat_id, []).append(i)
+            return cat_to_indices
+
+        self._cat_to_wds_indices = _build_cat_index(wds_train)
+        self._cat_to_wds_test_indices = _build_cat_index(wds_test)
 
     def __getattr__(self, name):
         return getattr(self._dm, name)
 
     def get_task_data(self, source: str, class_list: list):
-        if source in ("train", "train_no_aug"):
-            trsf = self._dm.train_trsf if source == "train" else self._dm.test_trsf
+        if source in ("train", "train_no_aug", "test"):
+            if source == "train":
+                wds_ds = self._wds_train
+                index_map = self._cat_to_wds_indices
+                trsf = self._dm.train_trsf
+            elif source == "train_no_aug":
+                wds_ds = self._wds_train
+                index_map = self._cat_to_wds_indices
+                trsf = self._dm.test_trsf
+            else:  # test
+                wds_ds = self._wds_test
+                index_map = self._cat_to_wds_test_indices
+                trsf = self._dm.test_trsf
             indices: List[int] = []
             labels: List[int] = []
             for cat_id in class_list:
-                for idx in self._cat_to_wds_indices.get(cat_id, []):
+                for idx in index_map.get(cat_id, []):
                     indices.append(idx)
                     labels.append(cat_id)
             if not indices:
                 raise ValueError(
-                    f"WDS train: no samples found for class_list={class_list!r}"
+                    f"WDS {source}: no samples found for class_list={class_list!r}"
                 )
             return _WdsTrainTaskDataset(
-                self._wds_train, indices,
+                wds_ds, indices,
                 np.array(labels, dtype=np.int64), trsf,
             )
         return self._dm.get_task_data(source, class_list)
 
 
 def _wrap_datamanger_with_wds_train(dm: DataManger, wds_dir: str) -> _WdsBackedDataManger:
-    """Return a DataManger wrapper that serves train data from WDS shards."""
+    """Return a DataManger wrapper that serves train and test data from WDS shards."""
     if _QZ_SRC not in sys.path:
         sys.path.insert(0, _QZ_SRC)
     from kanerva_sdm.data.wds_loader import WdsDataset  # type: ignore
 
     wds_train = WdsDataset(wds_dir, "train", transform=None)
+    wds_test = WdsDataset(wds_dir, "test", transform=None)
     logging.info(
         "WDS train loader: %d samples, %d classes from %s",
         len(wds_train), len(wds_train.classes), wds_dir,
     )
-    return _WdsBackedDataManger(dm, wds_train)
+    logging.info(
+        "WDS test loader: %d samples, %d classes from %s",
+        len(wds_test), len(wds_test.classes), wds_dir,
+    )
+    return _WdsBackedDataManger(dm, wds_train, wds_test)
 
 
 # ─────────────────────────────────────────────────────────────────────────────

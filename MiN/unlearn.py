@@ -294,6 +294,33 @@ def _wrap_datamanger_with_wds_train(dm: DataManger, wds_dir: str) -> _WdsBackedD
 
 
 # ─────────────────────────────────────────────────────────────────────────────
+# Ablation A0 — zero ALL noise generators
+# ─────────────────────────────────────────────────────────────────────────────
+
+def ablation_a0_zero_all_noise(model: MinNet) -> MinNet:
+    """
+    A0: Zero weight_noise for every task across all PiNoise layers.
+
+    The noise sum in each block becomes identically zero, so the forward pass
+    reduces to x1 + hyper_features (shared MLP residual + transformer block
+    output) for every layer. This is a task-agnostic ablation used to measure
+    how much discriminative signal the noise generators contribute overall,
+    independent of task-specific routing.
+
+    If accuracy on the forgotten task is unchanged relative to A1/A2, the noise
+    generators carry negligible information and the backbone features alone drive
+    classification. If accuracy degrades substantially across all tasks, the
+    generators are load-bearing.
+    """
+    m = copy.deepcopy(model)
+    net = m._network
+    for j in range(net.backbone.layer_num):
+        pi = net.backbone.noise_maker[j]
+        pi.weight_noise = torch.zeros_like(pi.weight_noise.detach())
+    return m
+
+
+# ─────────────────────────────────────────────────────────────────────────────
 # Ablation A1 — zero mixture weight
 # ─────────────────────────────────────────────────────────────────────────────
 
@@ -704,7 +731,7 @@ def save_plots(
         logging.info("Saved plot → %s", path2)
 
     # Figure 3: predicted-class histogram for forgotten task (strongest ablation).
-    for target_method in ["A3 — full removal", "A2 — remove generator"]:
+    for target_method in ["A3 — full removal", "A2 — remove generator", "A0 — zero all noise"]:
         if target_method in results:
             cf = results[target_method].get("confusion", {})
             dist = cf.get("pred_distribution", {})
@@ -795,6 +822,10 @@ def run_unlearning_experiments(
     baseline = _eval(model, probe=run_feature_probe)
     baseline_retained = baseline["retained_accuracy"]
 
+    # A0.
+    logging.info("A0: zeroing ALL noise generators …")
+    eval_a0 = _eval(ablation_a0_zero_all_noise(model), baseline_retained)
+
     # A1.
     logging.info("A1: zeroing mixture weight …")
     eval_a1 = _eval(ablation_a1_zero_weight(model, task_to_forget), baseline_retained)
@@ -813,6 +844,7 @@ def run_unlearning_experiments(
 
     all_results = {
         "Baseline": baseline,
+        "A0 — zero all noise": eval_a0,
         "A1 — zero weight": eval_a1,
         "A2 — remove generator": eval_a2,
         "A3 — full removal": eval_a3,
@@ -846,24 +878,41 @@ def run_unlearning_experiments(
 def _print_interpretation(results: Dict[str, Dict], task_to_forget: int) -> None:
     """Print a human-readable interpretation of the unlearning results."""
     b_f  = results["Baseline"]["forgotten_accuracy"]
+    a0_f = results["A0 — zero all noise"]["forgotten_accuracy"]
     a1_f = results["A1 — zero weight"]["forgotten_accuracy"]
     a2_f = results["A2 — remove generator"]["forgotten_accuracy"]
     a3_f = results["A3 — full removal"]["forgotten_accuracy"]
 
+    a0_bwt = results["A0 — zero all noise"].get("bwt") or 0.0
     a1_bwt = results["A1 — zero weight"].get("bwt") or 0.0
     a2_bwt = results["A2 — remove generator"].get("bwt") or 0.0
     a3_bwt = results["A3 — full removal"].get("bwt") or 0.0
 
-    w_drop  = b_f  - a1_f   # effect of zeroing mixture weight alone
+    n_drop  = b_f  - a0_f   # effect of zeroing all noise (global noise contribution)
+    w_drop  = b_f  - a1_f   # effect of zeroing task mixture weight alone
     g_drop  = a1_f - a2_f   # additional effect of zeroing generator params
     c_drop  = a2_f - a3_f   # additional effect of zeroing classifier columns
 
     print("\n── Interpretation ───────────────────────────────────────────────────────")
-    print(f"  Forgotten task accuracy:  baseline={b_f:.1%}  A1={a1_f:.1%}  A2={a2_f:.1%}  A3={a3_f:.1%}")
+    print(f"  Forgotten task accuracy:  baseline={b_f:.1%}  A0={a0_f:.1%}  A1={a1_f:.1%}  A2={a2_f:.1%}  A3={a3_f:.1%}")
     print()
+    print(f"  Drop A0 vs baseline : {n_drop:+.1%}  (all noise generators — global signal)")
     print(f"  Drop A1 vs baseline : {w_drop:+.1%}  (mixture-weight routing)")
     print(f"  Drop A2 vs A1       : {g_drop:+.1%}  (noise-generator parameters)")
     print(f"  Drop A3 vs A2       : {c_drop:+.1%}  (analytic classifier columns)")
+
+    a0_mean_ret = results["A0 — zero all noise"].get("mean_retained_accuracy", float("nan"))
+    b_mean_ret  = results["Baseline"].get("mean_retained_accuracy", float("nan"))
+    print()
+    if abs(n_drop) < 0.02 and abs(a0_mean_ret - b_mean_ret) < 0.02:
+        print("  ► Noise generators carry negligible discriminative signal; backbone")
+        print("    features (x1 + hyper_features) alone drive classification.")
+    elif n_drop > 0.05:
+        print(f"  ► Noise generators contribute meaningfully to the forgotten task")
+        print(f"    ({n_drop:+.1%} drop), but task-specific routing (A1/A2) is still insufficient.")
+    if abs(a0_mean_ret - b_mean_ret) > 0.05:
+        print(f"  ► Zeroing all noise degrades retained tasks by {a0_mean_ret - b_mean_ret:+.1%} mean acc —")
+        print(f"    noise is load-bearing for general classification, not just the forgotten task.")
 
     if w_drop > 0.10:
         print("  ► Mixture weights carry significant routing — A1 partially effective.")
@@ -881,8 +930,8 @@ def _print_interpretation(results: Dict[str, Dict], task_to_forget: int) -> None
         print("  ► Once the generator is removed, the classifier adds minimal task signal.")
 
     print(f"\n  Collateral damage (BWT on retained tasks):")
-    print(f"    A1: {a1_bwt:+.4f}  |  A2: {a2_bwt:+.4f}  |  A3: {a3_bwt:+.4f}")
-    worst = min(a1_bwt, a2_bwt, a3_bwt)
+    print(f"    A0: {a0_bwt:+.4f}  |  A1: {a1_bwt:+.4f}  |  A2: {a2_bwt:+.4f}  |  A3: {a3_bwt:+.4f}")
+    worst = min(a0_bwt, a1_bwt, a2_bwt, a3_bwt)
     if worst < -0.05:
         print("  ► Significant collateral damage — retained tasks degraded by unlearning.")
     elif worst < -0.01:
@@ -930,7 +979,7 @@ def _make_serialisable(obj):
 
 def print_all_tasks_summary(per_task_results: Dict[int, Dict]) -> None:
     """Print a cross-task aggregate table after running --all_tasks."""
-    methods = ["Baseline", "A1 — zero weight", "A2 — remove generator", "A3 — full removal"]
+    methods = ["Baseline", "A0 — zero all noise", "A1 — zero weight", "A2 — remove generator", "A3 — full removal"]
     col = 14
     header = f"{'Task':>5}  " + "  ".join(f"{m[:col]:>{col}}" for m in methods)
     sep = "─" * len(header)
@@ -976,7 +1025,7 @@ def print_all_tasks_summary(per_task_results: Dict[int, Dict]) -> None:
 
 def save_all_tasks_plot(per_task_results: Dict[int, Dict], output_dir: str) -> None:
     """Heat-map of forgotten-task accuracy across all (task, method) combinations."""
-    methods = ["Baseline", "A1 — zero weight", "A2 — remove generator", "A3 — full removal"]
+    methods = ["Baseline", "A0 — zero all noise", "A1 — zero weight", "A2 — remove generator", "A3 — full removal"]
     tasks = sorted(per_task_results.keys())
     data = np.array([
         [per_task_results[t].get(m, {}).get("forgotten_accuracy", float("nan")) * 100
@@ -1002,6 +1051,93 @@ def save_all_tasks_plot(per_task_results: Dict[int, Dict], output_dir: str) -> N
     logging.info("Saved plot → %s", path)
 
 
+def run_a0_experiment(
+    args: dict,
+    model: MinNet,
+    datamanger: DataManger,
+    output_dir: str,
+    wds_dir: Optional[str] = None,
+) -> Dict:
+    """Evaluate baseline vs A0 (all noise zeroed) across every task.
+
+    Since A0 is task-agnostic the ablated model is built once, then per-task
+    accuracy is reported for both baseline and A0 side-by-side.  This is the
+    right framing for the question "how much do noise generators contribute
+    globally?" — no forgotten/retained split is needed.
+    """
+    device = args["device"]
+    total_tasks = datamanger.task_size + 1
+    test_loaders = build_per_task_test_loaders(datamanger, args, total_tasks, wds_dir=wds_dir)
+
+    def _per_task_acc(m: MinNet) -> Dict[int, float]:
+        m._network.eval()
+        accs: Dict[int, float] = {}
+        for t, loader in test_loaders.items():
+            ev = UnlearningEvaluator(m, test_loaders, t, [], device)
+            p, l = ev._predict(loader)
+            accs[t] = float((p == l).mean())
+        return accs
+
+    logging.info("A0 experiment: evaluating baseline …")
+    baseline_accs = _per_task_acc(model)
+
+    logging.info("A0 experiment: zeroing all noise generators …")
+    model_a0 = ablation_a0_zero_all_noise(model)
+    a0_accs = _per_task_acc(model_a0)
+
+    # Print table.
+    col = 12
+    header = f"  {'Task':>5}  {'Baseline':>{col}}  {'A0 — no noise':>{col}}  {'Delta':>{col}}"
+    sep = "─" * len(header)
+    print(f"\n{sep}")
+    print("  A0: per-task accuracy — baseline vs all noise zeroed")
+    print(sep)
+    print(header)
+    print(sep)
+    for t in sorted(baseline_accs):
+        b = baseline_accs[t]
+        a = a0_accs[t]
+        print(f"  {t:>5}  {b:>{col}.1%}  {a:>{col}.1%}  {a - b:>+{col}.1%}")
+    mean_b = float(np.mean(list(baseline_accs.values())))
+    mean_a = float(np.mean(list(a0_accs.values())))
+    print(sep)
+    print(f"  {'mean':>5}  {mean_b:>{col}.1%}  {mean_a:>{col}.1%}  {mean_a - mean_b:>+{col}.1%}")
+    print(sep)
+
+    if abs(mean_a - mean_b) < 0.02:
+        print("\n  ► Noise generators carry negligible signal — backbone features dominate.")
+    elif mean_a < mean_b - 0.05:
+        print(f"\n  ► Noise contributes meaningfully: mean accuracy drops {mean_b - mean_a:.1%} without it.")
+    print()
+
+    result = {"baseline": baseline_accs, "a0": a0_accs}
+
+    os.makedirs(output_dir, exist_ok=True)
+    ts = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+    json_path = os.path.join(output_dir, f"a0_experiment_{ts}.json")
+    with open(json_path, "w") as fh:
+        json.dump(_make_serialisable(result), fh, indent=2)
+    logging.info("A0 results JSON → %s", json_path)
+
+    # Plot.
+    tasks = sorted(baseline_accs)
+    fig, ax = plt.subplots(figsize=(max(8, len(tasks) * 0.5), 4))
+    ax.plot(tasks, [baseline_accs[t] * 100 for t in tasks], marker="o", label="Baseline")
+    ax.plot(tasks, [a0_accs[t] * 100 for t in tasks], marker="s", label="A0 — no noise")
+    ax.set_xlabel("Task index")
+    ax.set_ylabel("Accuracy (%)")
+    ax.set_title("Per-task accuracy: baseline vs all noise zeroed")
+    ax.legend()
+    ax.set_ylim(0, 105)
+    fig.tight_layout()
+    plot_path = os.path.join(output_dir, "a0_per_task.png")
+    fig.savefig(plot_path, dpi=150)
+    plt.close(fig)
+    logging.info("A0 plot → %s", plot_path)
+
+    return result
+
+
 def parse_args() -> argparse.Namespace:
     p = argparse.ArgumentParser(description="MiN unlearning experiments")
     p.add_argument("--base_configs",    required=True, help="Base config JSON path")
@@ -1010,6 +1146,8 @@ def parse_args() -> argparse.Namespace:
                    help="Task index to unlearn (0-indexed). Omit with --all_tasks.")
     p.add_argument("--all_tasks",       action="store_true",
                    help="Run ablations for every task (train once, ablate all)")
+    p.add_argument("--a0_only",         action="store_true",
+                   help="Run only the A0 (zero all noise) experiment across all tasks")
     p.add_argument("--checkpoint",      default=None,
                    help="Path to unlearn checkpoint (skips training)")
     p.add_argument("--save_checkpoint", action="store_true",
@@ -1033,8 +1171,8 @@ def parse_args() -> argparse.Namespace:
 def main() -> None:
     cli = parse_args()
 
-    if not cli.all_tasks and cli.task_to_forget is None:
-        raise SystemExit("error: provide --task_to_forget N or --all_tasks")
+    if not cli.all_tasks and not cli.a0_only and cli.task_to_forget is None:
+        raise SystemExit("error: provide --task_to_forget N, --all_tasks, or --a0_only")
 
     with open(cli.base_configs) as fh:
         args = json.load(fh)
@@ -1088,6 +1226,16 @@ def main() -> None:
         save_unlearn_checkpoint(model, os.path.join(out_dir, "trained_model.pt"))
 
     # ── Run experiments ────────────────────────────────────────────────────────
+    if cli.a0_only:
+        run_a0_experiment(
+            args=args,
+            model=model,
+            datamanger=datamanger,
+            output_dir=out_dir,
+            wds_dir=wds_dir,
+        )
+        return
+
     if cli.all_tasks:
         total_tasks = datamanger.task_size + 1
         logging.info("Running ablations for all %d tasks …", total_tasks)

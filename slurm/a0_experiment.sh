@@ -13,7 +13,7 @@
 REPO=/gpfs/data/oermannlab/users/zhouj14/MiN-NeurIPS2025
 CKPT_ROOT=/gpfs/data/oermannlab/users/zhouj14/min_unlearn_results
 OUT_ROOT=/gpfs/data/oermannlab/users/zhouj14/min_a0_results
-DATA_ROOT=/gpfs/data/oermannlab/users/zhouj14/qz-compcont-learning/data
+DATA_ROOT="${DATA_ROOT:-/gpfs/data/oermannlab/public_data/continual_learning}"
 WDS_BASE="${WDS_BASE:-/gpfs/data/oermannlab/public_data/continual_learning/webdatasets}"
 
 # ── Benchmark lookup (index 0–6) ──────────────────────────────────────────────

@@ -81,7 +81,7 @@ class DINOv2MiNWrapper(nn.Module):
 
     def forward(self, x: torch.Tensor, new_forward: bool = False) -> torch.Tensor:
         # Re-normalise from MiN's (mean=0.5, std=0.5) to ImageNet (mean≈0.485, std≈0.229)
-        x = x * self.renorm_scale + self.renorm_shift
+        x = x * self.renorm_scale.to(x.device) + self.renorm_shift.to(x.device)
         # Tokenise + add cls token + positional embeddings
         x = self.dino.prepare_tokens_with_masks(x, None)   # [B, 1+N, D]
 
@@ -226,7 +226,7 @@ class DINOv3MiNWrapper(nn.Module):
 
     def forward(self, x: torch.Tensor, new_forward: bool = False) -> torch.Tensor:
         # Re-normalise from MiN's (mean=0.5, std=0.5) to ImageNet (mean≈0.485, std≈0.229)
-        x = x * self.renorm_scale + self.renorm_shift
+        x = x * self.renorm_scale.to(x.device) + self.renorm_shift.to(x.device)
         # Match DINOv3ViTModel.forward: embeddings + RoPE, then blocks + final norm.
         pixel_values = x.to(self.hf_model.embeddings.patch_embeddings.weight.dtype)
         hidden_states = self.hf_model.embeddings(pixel_values)

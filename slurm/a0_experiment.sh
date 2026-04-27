@@ -94,10 +94,22 @@ if [[ ! -f "${CHECKPOINT}" ]]; then
     exit 1
 fi
 
+# ── Slack notification helper ─────────────────────────────────────────────────
+_slack() {
+    local msg="$1"
+    if [[ -n "${SLACK_WEBHOOK:-}" ]]; then
+        curl -s -X POST -H 'Content-type: application/json' \
+            --data "{\"text\":\"${msg}\"}" \
+            "${SLACK_WEBHOOK}" || true
+    fi
+}
+
 # ── Run ───────────────────────────────────────────────────────────────────────
 cd "${REPO}"
 
-python MiN/unlearn.py \
+_slack "[:arrow_forward:] min_a0 started — array task ${SLURM_ARRAY_TASK_ID} (${BENCHMARK} / ${BACKBONE}) on \`$(hostname)\`"
+
+if python MiN/unlearn.py \
     --base_configs  "${BASE_CFG}" \
     --model_configs "${MODEL_CFG}" \
     --checkpoint    "${CHECKPOINT}" \
@@ -105,4 +117,9 @@ python MiN/unlearn.py \
     --wds_dir       "${WDS_DIR}" \
     --output_dir    "${OUT_DIR}" \
     --a0_only \
-    --no_feature_probe
+    --no_feature_probe; then
+    _slack "[:white_check_mark:] min_a0 done — array task ${SLURM_ARRAY_TASK_ID} (${BENCHMARK} / ${BACKBONE})"
+else
+    _slack "[:x:] min_a0 FAILED — array task ${SLURM_ARRAY_TASK_ID} (${BENCHMARK} / ${BACKBONE}) exit code $?"
+    exit 1
+fi

@@ -430,6 +430,10 @@ def load_unlearn_checkpoint(model: MinNet, path: str) -> MinNet:
     """Restore a MiN model from a checkpoint written by save_unlearn_checkpoint()."""
     ckpt = torch.load(path, map_location="cpu")
     net = model._network
+    # weight starts as [buffer_size, 0]; expand to match checkpoint before load_state_dict
+    ckpt_weight = ckpt["state_dict"].get("weight")
+    if ckpt_weight is not None and ckpt_weight.shape != net.weight.shape:
+        net.weight = torch.zeros_like(ckpt_weight)
     net.load_state_dict(ckpt["state_dict"])
     dev = net.device
     for j in range(net.backbone.layer_num):

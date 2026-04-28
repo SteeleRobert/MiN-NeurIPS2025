@@ -1,6 +1,6 @@
 #!/bin/bash
 #SBATCH --job-name=min_a0
-#SBATCH --array=0-20
+#SBATCH --array=0-17
 #SBATCH --partition=gpu4_medium
 #SBATCH --gres=gpu:1
 #SBATCH --cpus-per-task=4
@@ -18,7 +18,7 @@ DATA_ROOT="${DATA_ROOT:-/gpfs/data/oermannlab/public_data/continual_learning}"
 WDS_BASE="${WDS_BASE:-/gpfs/data/oermannlab/public_data/continual_learning/webdatasets}"
 
 # ── Benchmark lookup (index 0–6) ──────────────────────────────────────────────
-BENCHMARKS=(cifar100   imagenetr   imageneta   cub200   omnibenchmark   vtab   objectnet)
+BENCHMARKS=(cifar100   imagenetr   imageneta   cub200   omnibenchmark   vtab)
 
 BASE_CONFIGS=(
     MiN/configs/base_configs/cifar_ease.json
@@ -27,14 +27,13 @@ BASE_CONFIGS=(
     MiN/configs/base_configs/cub_ease.json
     MiN/configs/base_configs/omnibenchmark_ease.json
     MiN/configs/base_configs/vtab_ease.json
-    MiN/configs/base_configs/objectnet_ease.json
 )
 
 # Protocols used in checkpoint directory names
-PROTOCOLS=(20T 40T 10T 20T 10T 5T 20T)
+PROTOCOLS=(20T 40T 10T 20T 10T 5T)
 
 # WDS subdirectory names (matches _WDS_SUBDIR in unlearn.py)
-WDS_SUBDIRS=(cifar_100 imagenet_r imagenet_a cub_200 omnibenchmark vtab objectnet)
+WDS_SUBDIRS=(cifar_100 imagenet_r imagenet_a cub_200 omnibenchmark vtab)
 
 # ── Backbone lookup (index 0–2) ───────────────────────────────────────────────
 BACKBONES=(pretrained_vit_b16_224_in21k_min   dinov2_vitb14   dinov3_vitb16)
@@ -65,7 +64,6 @@ case $BENCHMARK in
     cub200)        MODEL_BASE="MiN-cub-10steps" ;;
     omnibenchmark) MODEL_BASE="MiN-omni-10steps" ;;
     vtab)          MODEL_BASE="MiN-vtab-5steps" ;;
-    objectnet)     MODEL_BASE="MiN-inr-10steps" ;;
 esac
 
 MODEL_CFG="MiN/configs/model_configs/${MODEL_BASE}${MODEL_SUFFIX}.json"

@@ -436,6 +436,7 @@ def load_unlearn_checkpoint(model: MinNet, path: str) -> MinNet:
         net.weight = torch.zeros_like(ckpt_weight)
     net.load_state_dict(ckpt["state_dict"])
     dev = net.device
+    net.to(dev)
     for j in range(net.backbone.layer_num):
         pi = net.backbone.noise_maker[j]
         pi.weight_noise = ckpt["weight_noise"][j].to(dev)

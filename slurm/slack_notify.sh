@@ -180,15 +180,23 @@ min_slack_notify() {
     local task=""
     if [[ -n "${SLURM_ARRAY_TASK_ID:-}" ]]; then
         task=" array=${SLURM_ARRAY_TASK_ID}"
-        if [[ -n "${SLURM_ARRAY_TASK_COUNT:-}" ]]; then
-            task+="/${SLURM_ARRAY_TASK_COUNT}"
+        if [[ -n "${SLURM_ARRAY_TASK_MAX:-}" ]]; then
+            task+="/${SLURM_ARRAY_TASK_MAX}"
         fi
     fi
     local bb="${BACKBONE:-}"
+    local clf="${CLASSIFIER:-}"
+    local bm="${BENCHMARK:-}"
+    local cpt="${CPT:-}"
+    local spc="${SPC:-}"
     local line="*${name}* job ${job}${task} @ ${host}"
-    if [[ -n "$bb" ]]; then
-        line+=" — *${bb}*"
-    fi
+    local run_meta=""
+    [[ -n "$bm" ]]  && run_meta+="${bm}"
+    [[ -n "$bb" ]]  && run_meta+="${run_meta:+ | }${bb}"
+    [[ -n "$clf" ]] && run_meta+="${run_meta:+ | }${clf}"
+    [[ -n "$cpt" ]] && run_meta+="${run_meta:+ | }cpt=${cpt}"
+    [[ -n "$spc" ]] && run_meta+="${run_meta:+ | }spc=${spc}"
+    [[ -n "$run_meta" ]] && line+=" — *${run_meta}*"
     line+=" — ${status_msg}"
 
     # Slack often renders top-level "text" as plain; Block Kit "mrkdwn" sections get formatting.

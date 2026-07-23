@@ -317,6 +317,8 @@ def ablation_a0_zero_all_noise(model: MinNet) -> MinNet:
     for j in range(net.backbone.layer_num):
         pi = net.backbone.noise_maker[j]
         pi.weight_noise = torch.zeros_like(pi.weight_noise.detach())
+    print('sanity check')
+    print(m._network.backbone.noise_maker[0].weight_noise)
     return m
 
 

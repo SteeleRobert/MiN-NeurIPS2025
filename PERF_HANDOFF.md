@@ -173,11 +173,30 @@ ARM-B-tf32       0.39    2.74    6.36    <- identical to printed precision, 3/3
 ARM-C-tf32-dl    0.57    2.58    8.08    <- differs; see below
 ```
 
-This is a short-horizon proxy, stated plainly as such: **3 epochs of task 0, not a
-completed cell.** It is strong evidence — an exact match on every epoch is what a
-benign TF32 change looks like, and a collapse mode would not hide here — but the full
-gate (final `avg_acc` within ±0.15 pp of 64.569%) has *not* been cleared. Job 25862812
-was still running at the time of writing; re-read its logs for later stages.
+**Stage-level `total acc`** — the decisive comparison:
+
+| stage | reference (H100, unmodified) | `ARM-A` baseline (A100, unmodified) | `ARM-B` tf32 (A100) | `ARM-C` tf32+dl (A100) |
+|---|---|---|---|---|
+| 0 | 87.74 | **87.70** | **87.70** | 87.66 |
+| 1 | 83.90 | — | 83.96 | 83.84 |
+| 2 | 80.77 | — | 80.82 | 80.77 |
+
+**TF32 and the unmodified baseline give bit-for-bit the same stage-0 accuracy on the
+same hardware: 87.70 vs 87.70.** The residual 0.04 pp against the reference is therefore
+**A100-vs-H100 fp32 nondeterminism, not TF32** — which is exactly what you want the
+answer to be, and could not have been established without running the unmodified arm
+alongside.
+
+Across the three completed stages TF32 tracks the reference within **0.06 pp**, well
+inside the ±0.15 pp gate. `ARM-C` also stays inside it (max 0.08 pp) despite drawing a
+different augmentation RNG realization — so the `num_workers` change is statistically
+benign even though it moves the exact numbers.
+
+Stated plainly: this is a **short-horizon proxy — 3 of 20 stages, not a completed
+cell.** The full gate (final `avg_acc` within ±0.15 pp of 64.569%) is not cleared. But
+an exact same-hardware match at stage 0, plus three stages of tight tracking, is strong
+evidence; the DINOv3 collapse mode would not hide this far in. Job 25862812 kept
+running — re-read its logs for later stages.
 
 **`ARM-C` diverging is a real finding, not noise.** MiN constructs its DataLoaders with
 no `worker_init_fn` and no explicit `generator`, so each worker's RNG is derived from

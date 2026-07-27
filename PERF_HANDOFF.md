@@ -151,24 +151,33 @@ the keys under test. Task 0, `init_epochs=20`.
 
 | arm | s/epoch | speedup |
 |---|---|---|
-| `ARM-A-baseline` (fp32) | **148** | 1.00× |
-| `ARM-B-tf32` | **56** | **2.64×** |
+| `ARM-A-baseline` (fp32) | **148.5** | 1.00× |
+| `ARM-B-tf32` | **56** | **2.65×** |
 | `ARM-C-tf32-dl` | **53** | **2.79×** |
 
-2.64× on A100 lands inside the predicted 2.5–3.5× band. The A100 fp32→TF32 peak ratio
-is 8×, so realizing 2.64× implies ~⅓ of wall-clock is non-GEMM (small PiNoise ops,
+All three GPUs sat at ~100% utilisation throughout, so this is a GPU-bound comparison,
+not a CPU-contention artifact (checked: `nvidia-smi` 100/99/99%).
+
+2.65× on A100 lands inside the predicted 2.5–3.5× band. The A100 fp32→TF32 peak ratio
+is 8×, so realizing 2.65× implies ~⅓ of wall-clock is non-GEMM (small PiNoise ops,
 dataloading, the float64 head) — consistent with §2. H100's ratio is 7.4×, so the same
 projection holds there. **Projected H+ cell: 43 h → ~16 h.** That would have met the
 15–20 h target.
 
-**Correctness** — TF32 tracks the baseline *exactly*, epoch for epoch:
+**Correctness** — TF32 tracks the baseline *exactly*, epoch for epoch (`train_accy`):
 
 ```
-                 Epoch 1    Epoch 2
-ARM-A-baseline   0.39       2.74
-ARM-B-tf32       0.39       2.74     <- identical to printed precision
-ARM-C-tf32-dl    0.57       2.58     <- differs; see below
+                 Ep 1    Ep 2    Ep 3
+ARM-A-baseline   0.39    2.74    6.36
+ARM-B-tf32       0.39    2.74    6.36    <- identical to printed precision, 3/3
+ARM-C-tf32-dl    0.57    2.58    8.08    <- differs; see below
 ```
+
+This is a short-horizon proxy, stated plainly as such: **3 epochs of task 0, not a
+completed cell.** It is strong evidence — an exact match on every epoch is what a
+benign TF32 change looks like, and a collapse mode would not hide here — but the full
+gate (final `avg_acc` within ±0.15 pp of 64.569%) has *not* been cleared. Job 25862812
+was still running at the time of writing; re-read its logs for later stages.
 
 **`ARM-C` diverging is a real finding, not noise.** MiN constructs its DataLoaders with
 no `worker_init_fn` and no explicit `generator`, so each worker's RNG is derived from

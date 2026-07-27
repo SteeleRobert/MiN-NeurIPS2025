@@ -15,6 +15,7 @@ import os
 from data_process.data_manger import DataManger
 from utils.training_tool import get_optimizer, get_scheduler
 from utils.toolkit import calculate_class_metrics, calculate_task_metrics
+from utils.perf import loader_kwargs
 
 EPSILON = 1e-8
 
@@ -52,6 +53,10 @@ class MinNet(object):
         self.class_acc = []
         self.task_acc = []
 
+    def _loader_kwargs(self):
+        """DataLoader worker/prefetch kwargs (config-overridable, default unchanged)."""
+        return loader_kwargs(self.args, self.num_workers)
+
     def after_train(self, data_manger):
         if self.cur_task == 0:
             self.known_class = self.init_class
@@ -62,7 +67,7 @@ class MinNet(object):
         test_set = data_manger.get_task_data(source="test", class_list=test_list)
         test_set.labels = self.cat2order(test_set.labels, data_manger)
         test_loader = DataLoader(test_set, batch_size=self.init_batch_size, shuffle=False,
-                                 num_workers=self.num_workers)
+                                 **self._loader_kwargs())
         eval_res = self.eval_task(test_loader)
         self.total_acc.append(round(float(eval_res['all_class_accy']*100.), 2))
         self.logger.info('total acc: {}'.format(self.total_acc))
@@ -108,9 +113,9 @@ class MinNet(object):
         test_set.labels = self.cat2order(test_set.labels, data_manger)
 
         train_loader = DataLoader(train_set, batch_size=self.init_batch_size, shuffle=True,
-                                  num_workers=self.num_workers)
+                                  **self._loader_kwargs())
         test_loader = DataLoader(test_set, batch_size=self.init_batch_size, shuffle=False,
-                                 num_workers=self.num_workers)
+                                 **self._loader_kwargs())
 
         self.test_loader = test_loader
 
@@ -126,18 +131,18 @@ class MinNet(object):
         prototype = self.get_task_prototype(self._network, train_loader)
         self._network.update_task_prototype(prototype)
         train_loader = DataLoader(train_set, batch_size=self.buffer_batch, shuffle=True,
-                                  num_workers=self.num_workers)
+                                  **self._loader_kwargs())
         test_loader = DataLoader(test_set, batch_size=self.buffer_batch, shuffle=False,
-                                 num_workers=self.num_workers)
+                                 **self._loader_kwargs())
         torch.cuda.empty_cache()
         self.fit_fc(train_loader, test_loader)
 
         train_set = data_manger.get_task_data(source="train_no_aug", class_list=train_list)
         train_set.labels = self.cat2order(train_set.labels, data_manger)
         train_loader = DataLoader(train_set, batch_size=self.buffer_batch, shuffle=True,
-                                  num_workers=self.num_workers)
+                                  **self._loader_kwargs())
         test_loader = DataLoader(test_set, batch_size=self.buffer_batch, shuffle=False,
-                                 num_workers=self.num_workers)
+                                 **self._loader_kwargs())
 
         if self.args['pretrained']:
             for param in self._network.backbone.parameters():
@@ -161,9 +166,9 @@ class MinNet(object):
         test_set.labels = self.cat2order(test_set.labels, data_manger)
 
         train_loader = DataLoader(train_set, batch_size=self.buffer_batch, shuffle=True,
-                                  num_workers=self.num_workers)
+                                  **self._loader_kwargs())
         test_loader = DataLoader(test_set, batch_size=self.buffer_batch, shuffle=False,
-                                 num_workers=self.num_workers)
+                                 **self._loader_kwargs())
 
         self.test_loader = test_loader
 
@@ -177,7 +182,7 @@ class MinNet(object):
         self._network.update_fc(self.increment)
 
         train_loader = DataLoader(train_set, batch_size=self.batch_size, shuffle=True,
-                                    num_workers=self.num_workers)
+                                    **self._loader_kwargs())
         self._network.update_noise()
         prototype = self.get_task_prototype(self._network, train_loader)
         self._network.extend_task_prototype(prototype)
@@ -191,9 +196,9 @@ class MinNet(object):
         train_set.labels = self.cat2order(train_set.labels, data_manger)
 
         train_loader = DataLoader(train_set, batch_size=self.buffer_batch, shuffle=True,
-                                    num_workers=self.num_workers)
+                                    **self._loader_kwargs())
         test_loader = DataLoader(test_set, batch_size=self.buffer_batch, shuffle=False,
-                                    num_workers=self.num_workers)
+                                    **self._loader_kwargs())
 
         if self.args['pretrained']:
             for param in self._network.backbone.parameters():

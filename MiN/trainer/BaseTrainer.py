@@ -2,6 +2,7 @@ import sys
 import logging
 import torch
 from utils.factory import get_model
+from utils.perf import apply_perf_settings
 from data_process.data_manger import DataManger
 import os
 import datetime
@@ -119,6 +120,7 @@ def _train(args):
 
     # _set_random()
     _set_device(args)
+    apply_perf_settings(args, logging)
     print_args(args)
 
     datamanger = DataManger(args['dataset'], args['device'], args)

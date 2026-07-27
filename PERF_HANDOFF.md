@@ -13,10 +13,18 @@ this worktree is reclaimed. Push it or cherry-pick it somewhere durable.
 
 ## 1. The finding
 
-MiN never sets the float32 matmul precision. PyTorch has defaulted
-`torch.backends.cuda.matmul.allow_tf32 = False` since 1.12, and the `pytorch_min`
-container is torch 2.4.0. Verified by grep across all of `MiN/`: **no `autocast`, no
-`bfloat16`, no `float16`, no `allow_tf32`, no `torch.compile`, no `channels_last`.**
+MiN never sets the float32 matmul precision. Verified by grep across all of `MiN/`:
+**no `autocast`, no `bfloat16`, no `float16`, no `allow_tf32`, no `torch.compile`, no
+`channels_last`.**
+
+Confirmed directly inside the `pytorch_min` container (not inferred from docs):
+
+```
+transformers 5.5.3 | torch 2.4.0+cu121
+default matmul.allow_tf32 : False
+default matmul precision  : highest
+default cudnn.benchmark   : False
+```
 
 Every matmul in an 840M-parameter ViT runs true IEEE fp32, tensor cores idle.
 
@@ -147,10 +155,11 @@ transfers.
   floating-point path. Still mathematically exact RLS, but not batch-size-invariant the
   way a pure inference batch is. **Eval batch (`init_batch_size`) *is* genuinely Tier 1.**
 - **SDPA/FlashAttention is already on, and currently inert.** MiN's `ViT_MiN.py` calls
-  `F.scaled_dot_product_attention`, and HF transformers defaults DINOv3 to
-  `attn_implementation="sdpa"`. But **Flash kernels are fp16/bf16-only** — in fp32 SDPA
-  silently falls back to the mem-efficient/math backend. Switching attention
-  implementations buys **nothing** until precision drops. Don't count it twice.
+  `F.scaled_dot_product_attention`, and HF transformers defaults DINOv3 to SDPA —
+  confirmed by instantiating the model in-container: `attn impl : sdpa`. But **Flash
+  kernels are fp16/bf16-only** — in fp32 SDPA silently falls back to the
+  mem-efficient/math backend. Switching attention implementations buys **nothing**
+  until precision drops. Don't count it twice.
 
 ## 6. Two data-path Tier 1 candidates found during validation
 
@@ -209,8 +218,10 @@ but free.
   and because of the collapse mode. Natural next step if TF32 under-delivers — same
   gate as §4, or stricter.
 - **DDP** (Tier 2, up to 8×). **The math is legitimate**: there is **no BatchNorm
-  anywhere** (LayerNorm + LayerScale only), so gradient averaging at constant global
-  batch is exactly identical; and `fit()`'s Sherman–Morrison–Woodbury recursion is
+  anywhere** — verified by walking every module of an instantiated DINOv3-B/16
+  (`BatchNorm: NONE`; 25 × `LayerNorm`, 24 × `DINOv3ViTLayerScale`) — so gradient
+  averaging at constant global batch is exactly identical; and `fit()`'s
+  Sherman–Morrison–Woodbury recursion is
   order-independent, converging to the exact batch ridge solution. But three real
   code-level blockers, **all of which fail silently rather than crashing**:
   1. `PiNoise.__init__` hardcodes `torch.device("cuda:0")` for its buffers

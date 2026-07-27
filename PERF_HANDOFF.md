@@ -175,28 +175,38 @@ ARM-C-tf32-dl    0.57    2.58    8.08    <- differs; see below
 
 **Stage-level `total acc`** — the decisive comparison:
 
-| stage | reference (H100, unmodified) | `ARM-A` baseline (A100, unmodified) | `ARM-B` tf32 (A100) | `ARM-C` tf32+dl (A100) |
+| stage | reference<br>(H100, unmod) | `ARM-A` baseline<br>(A100, unmod) | `ARM-B` tf32<br>(A100) | `ARM-C` tf32+dl<br>(A100) |
 |---|---|---|---|---|
 | 0 | 87.74 | **87.70** | **87.70** | 87.66 |
-| 1 | 83.90 | — | 83.96 | 83.84 |
-| 2 | 80.77 | — | 80.82 | 80.77 |
+| 1 | 83.90 | **83.95** | **83.96** | 83.84 |
+| 2 | 80.77 | **80.83** | **80.82** | 80.77 |
+| 3 | 78.67 | — | 78.66 | 78.72 |
+| 4 | 76.60 | — | 76.53 | 76.62 |
+| 5 | 75.07 | — | 74.99 | 74.97 |
+| 6 | 73.54 | — | 73.47 | 73.49 |
+| 7 | 72.23 | — | 72.18 | 72.13 |
 
-**TF32 and the unmodified baseline give bit-for-bit the same stage-0 accuracy on the
-same hardware: 87.70 vs 87.70.** The residual 0.04 pp against the reference is therefore
-**A100-vs-H100 fp32 nondeterminism, not TF32** — which is exactly what you want the
-answer to be, and could not have been established without running the unmodified arm
-alongside.
+Two things fall out, and the second is the one that matters:
 
-Across the three completed stages TF32 tracks the reference within **0.06 pp**, well
-inside the ±0.15 pp gate. `ARM-C` also stays inside it (max 0.08 pp) despite drawing a
-different augmentation RNG realization — so the `num_workers` change is statistically
-benign even though it moves the exact numbers.
+1. **TF32 vs the unmodified baseline, same hardware: max deviation 0.01 pp** over the
+   three stages where both exist (87.70/87.70, 83.95/83.96, 80.83/80.82).
+2. **The unmodified baseline deviates from the H100 reference by 0.04–0.06 pp** — the
+   *same magnitude* as TF32 does. So TF32's deviation from the reference is
+   **indistinguishable from A100-vs-H100 fp32 nondeterminism**. This could not have
+   been established by comparing TF32 to the reference alone; it required running the
+   unmodified arm on the same hardware. Keep that control in any future gate.
 
-Stated plainly: this is a **short-horizon proxy — 3 of 20 stages, not a completed
-cell.** The full gate (final `avg_acc` within ±0.15 pp of 64.569%) is not cleared. But
-an exact same-hardware match at stage 0, plus three stages of tight tracking, is strong
-evidence; the DINOv3 collapse mode would not hide this far in. Job 25862812 kept
-running — re-read its logs for later stages.
+Over 8 stages TF32 tracks the reference within **0.08 pp**, inside the ±0.15 pp gate.
+`ARM-C` stays inside too (max 0.10 pp) despite a different augmentation RNG
+realization — so `num_workers` is statistically benign even though it moves the exact
+numbers.
+
+**What is still not established.** This is 8 of 20 stages, not a completed cell, and
+the full gate (final `avg_acc` within ±0.15 pp of 64.569%) is **not** cleared. Job
+25862812's 6 h limit expires with TF32 around stage 12–13 and the baseline around stage
+5, so *that job cannot close the gate*. To finish it, run `ARM-B` alone for ~8 h — it
+needs no baseline arm now that (1) and (2) above are established. Until then this is a
+strong short-horizon proxy, not a pass.
 
 **`ARM-C` diverging is a real finding, not noise.** MiN constructs its DataLoaders with
 no `worker_init_fn` and no explicit `generator`, so each worker's RNG is derived from

@@ -81,13 +81,14 @@ Add to any model config to enable:
 
 ```jsonc
 {
-  "matmul_precision": "high",        // TF32.  default "highest" = unchanged fp32
-  "dataloader": {
-    "num_workers": 12,               // was 4
-    "persistent_workers": true,
-    "prefetch_factor": 4,
-    "pin_memory": true
-  }
+  "matmul_precision": "high",        // TF32. default "highest" = unchanged fp32.
+                                     // THIS IS THE ONE THAT MATTERS: 2.64x, validated.
+  "dataloader": {                    // optional, +6% -- read the caveat in 4b first
+    "persistent_workers": true,      //   safe: no effect on numerics
+    "prefetch_factor": 4,            //   safe
+    "pin_memory": true,              //   safe
+    "num_workers": 12                //   NOT numerically neutral -- reseeds
+  }                                  //   augmentation RNG. See 4b.
 }
 ```
 
@@ -140,6 +141,52 @@ Compare each arm's `total acc: [...]` per stage against the trajectory above. A1
 fine for the **correctness** gate; the speedup *ratio* differs from H100 (A100 is
 19.5 fp32 vs 156 TF32 TFLOPS, so the relative win is larger), but ±0.15 pp equivalence
 transfers.
+
+## 4b. Measured A/B result (2026-07-27, a100-8001, job 25862812)
+
+Three arms, `MiN-inat21-dinov3vitb16-fn-g1`, seed 42, identical in every respect except
+the keys under test. Task 0, `init_epochs=20`.
+
+**Speed** — steady-state seconds per epoch, from log timestamps:
+
+| arm | s/epoch | speedup |
+|---|---|---|
+| `ARM-A-baseline` (fp32) | **148** | 1.00× |
+| `ARM-B-tf32` | **56** | **2.64×** |
+| `ARM-C-tf32-dl` | **53** | **2.79×** |
+
+2.64× on A100 lands inside the predicted 2.5–3.5× band. The A100 fp32→TF32 peak ratio
+is 8×, so realizing 2.64× implies ~⅓ of wall-clock is non-GEMM (small PiNoise ops,
+dataloading, the float64 head) — consistent with §2. H100's ratio is 7.4×, so the same
+projection holds there. **Projected H+ cell: 43 h → ~16 h.** That would have met the
+15–20 h target.
+
+**Correctness** — TF32 tracks the baseline *exactly*, epoch for epoch:
+
+```
+                 Epoch 1    Epoch 2
+ARM-A-baseline   0.39       2.74
+ARM-B-tf32       0.39       2.74     <- identical to printed precision
+ARM-C-tf32-dl    0.57       2.58     <- differs; see below
+```
+
+**`ARM-C` diverging is a real finding, not noise.** MiN constructs its DataLoaders with
+no `worker_init_fn` and no explicit `generator`, so each worker's RNG is derived from
+`base_seed + worker_id`. The train transform is stochastic (`RandomResizedCrop`,
+`RandomHorizontalFlip`, `ColorJitter`), so **changing `num_workers` changes which
+augmentation RNG stream each sample draws from** — a different realization of the same
+distribution.
+
+**This corrects the brief's tiering.** Dataloader/worker tuning was listed as Tier 1
+("provably equivalent"). `pin_memory`, `prefetch_factor` and `persistent_workers` are.
+**`num_workers` is not**: it does not change semantics or expected performance, but it
+does change the exact numbers. Consequences:
+
+- Never bundle a `num_workers` change into an A/B you are running for equivalence.
+- Changing it breaks seed-for-seed comparability against existing sweep results.
+- **Ship `matmul_precision: "high"` on its own.** Treat `num_workers` as a separate,
+  sweep-wide decision made once, before a sweep starts — and note it is worth only
+  2.64× → 2.79× here.
 
 ## 5. Traps and corrections
 

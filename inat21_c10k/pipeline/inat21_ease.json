@@ -1,0 +1,11 @@
+{
+  "dataset": "inat21",
+  "init_class": 500,
+  "increment": 500,
+  "img_size": 224,
+  "save_all_checkpoint": false,
+  "shuffle": true,
+  "seed": 1993,
+  "data_root": "/gpfs/data/oermannlab/public_data/continual_learning",
+  "inat21_root": "/gpfs/data/oermannlab/public_data/inat21"
+}

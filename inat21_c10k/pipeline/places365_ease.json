@@ -1,0 +1,12 @@
+{
+  "dataset": "places365",
+  "init_class": 73,
+  "increment": 73,
+  "img_size": 224,
+  "save_all_checkpoint": false,
+  "shuffle": true,
+  "seed": 1993,
+  "data_root": "/gpfs/data/oermannlab/public_data/continual_learning",
+  "places365_root": "/gpfs/data/oermannlab/public_data/places365",
+  "samples_per_class": 1000
+}

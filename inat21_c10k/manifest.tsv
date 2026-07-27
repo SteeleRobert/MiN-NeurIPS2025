@@ -1,0 +1,48 @@
+inat21__dinov3_vitb16__fn-g1__s42	running	sp-0007	5	1	2026-07-26T17:46:39	/gpfs/data/oermannlab/users/steelr04/min_inat/logs/inat21__dinov3_vitb16__fn-g1__s42.log
+inat21__dinov2_vitb14__fn-g1__s42	running	sp-0007	3	1	2026-07-26T17:46:39	/gpfs/data/oermannlab/users/steelr04/min_inat/logs/inat21__dinov2_vitb14__fn-g1__s42.log
+inat21__dinov3_vitb16__orig__s42	running	sp-0007	7	1	2026-07-26T17:46:39	/gpfs/data/oermannlab/users/steelr04/min_inat/logs/inat21__dinov3_vitb16__orig__s42.log
+inat21__dinov3_vitb16__fn-g1__s1993	running	sp-0007	4	1	2026-07-26T17:46:39	/gpfs/data/oermannlab/users/steelr04/min_inat/logs/inat21__dinov3_vitb16__fn-g1__s1993.log
+inat21__dinov3_vitb16__fn-g1__s7	running	sp-0007	2	1	2026-07-26T17:46:39	/gpfs/data/oermannlab/users/steelr04/min_inat/logs/inat21__dinov3_vitb16__fn-g1__s7.log
+inat21__dinov2_vitb14__fn-g1__s1993	running	sp-0007	0	1	2026-07-26T17:46:39	/gpfs/data/oermannlab/users/steelr04/min_inat/logs/inat21__dinov2_vitb14__fn-g1__s1993.log
+inat21__dinov2_vitb14__fn-g1__s7	running	sp-0007	6	1	2026-07-26T17:46:39	/gpfs/data/oermannlab/users/steelr04/min_inat/logs/inat21__dinov2_vitb14__fn-g1__s7.log
+inat21__dinov3_vitl16__fn-g1__s42	running	sp-0007	1	1	2026-07-26T17:46:39	/gpfs/data/oermannlab/users/steelr04/min_inat/logs/inat21__dinov3_vitl16__fn-g1__s42.log
+inat21__dinov3_vitl16__fn-g1__s1993	running	sp-0013	3	1	2026-07-26T17:46:39	/gpfs/data/oermannlab/users/steelr04/min_inat/logs/inat21__dinov3_vitl16__fn-g1__s1993.log
+inat21__dinov3_vitl16__fn-g1__s7	running	sp-0013	7	1	2026-07-26T17:46:39	/gpfs/data/oermannlab/users/steelr04/min_inat/logs/inat21__dinov3_vitl16__fn-g1__s7.log
+inat21__dinov3_vith16__fn-g1__s42	running	sp-0013	1	1	2026-07-26T17:46:39	/gpfs/data/oermannlab/users/steelr04/min_inat/logs/inat21__dinov3_vith16__fn-g1__s42.log
+inat21__dinov3_vith16__fn-g1__s1993	running	sp-0013	4	1	2026-07-26T17:46:39	/gpfs/data/oermannlab/users/steelr04/min_inat/logs/inat21__dinov3_vith16__fn-g1__s1993.log
+inat21__dinov3_vith16__fn-g1__s7	running	sp-0013	6	1	2026-07-26T17:46:39	/gpfs/data/oermannlab/users/steelr04/min_inat/logs/inat21__dinov3_vith16__fn-g1__s7.log
+inat21__dinov2_vitb14__fn-g1__s42	retry	sp-0007	3	1	2026-07-26T17:47:57	exit=1
+inat21__dinov2_vitb14__fn-g1__s1993	retry	sp-0007	0	1	2026-07-26T17:47:57	exit=1
+inat21__dinov2_vitb14__fn-g1__s7	retry	sp-0007	6	1	2026-07-26T17:47:57	exit=1
+inat21__dinov2_vitb14__fn-g1__s7	running	sp-0007	6	2	2026-07-26T17:48:27	/gpfs/data/oermannlab/users/steelr04/min_inat/logs/inat21__dinov2_vitb14__fn-g1__s7.log
+inat21__dinov2_vitb14__fn-g1__s1993	running	sp-0007	0	2	2026-07-26T17:48:27	/gpfs/data/oermannlab/users/steelr04/min_inat/logs/inat21__dinov2_vitb14__fn-g1__s1993.log
+inat21__dinov2_vitb14__fn-g1__s42	running	sp-0007	3	2	2026-07-26T17:48:27	/gpfs/data/oermannlab/users/steelr04/min_inat/logs/inat21__dinov2_vitb14__fn-g1__s42.log
+inat21__dinov2_vitb14__fn-g1__s1993	retry	sp-0007	0	2	2026-07-26T17:48:57	exit=1
+inat21__dinov2_vitb14__fn-g1__s42	retry	sp-0007	3	2	2026-07-26T17:48:57	exit=1
+inat21__dinov2_vitb14__fn-g1__s7	retry	sp-0007	6	2	2026-07-26T17:48:57	exit=1
+inat21__dinov2_vitb14__fn-g1__s1993	FAILED	sp-0007	0	2	2026-07-26T17:49:27	see /gpfs/data/oermannlab/users/steelr04/min_inat/logs/inat21__dinov2_vitb14__fn-g1__s1993.log
+inat21__dinov2_vitb14__fn-g1__s7	FAILED	sp-0007	6	2	2026-07-26T17:49:27	see /gpfs/data/oermannlab/users/steelr04/min_inat/logs/inat21__dinov2_vitb14__fn-g1__s7.log
+inat21__dinov2_vitb14__fn-g1__s42	FAILED	sp-0007	3	2	2026-07-26T17:49:27	see /gpfs/data/oermannlab/users/steelr04/min_inat/logs/inat21__dinov2_vitb14__fn-g1__s42.log
+inat21__dinov2_vitb14__fn-g1__s42	running	sp-0013	5	1	2026-07-27T00:45:44	/gpfs/data/oermannlab/users/steelr04/min_inat/logs/inat21__dinov2_vitb14__fn-g1__s42.log
+inat21__dinov2_vitb14__fn-g1__s1993	running	sp-0013	0	1	2026-07-27T00:45:44	/gpfs/data/oermannlab/users/steelr04/min_inat/logs/inat21__dinov2_vitb14__fn-g1__s1993.log
+inat21__dinov2_vitb14__fn-g1__s7	running	sp-0013	2	1	2026-07-27T00:45:44	/gpfs/data/oermannlab/users/steelr04/min_inat/logs/inat21__dinov2_vitb14__fn-g1__s7.log
+inat21__dinov3_vitb16__fn-g1__s2024	running	sp-0014	6	1	2026-07-27T00:45:44	/gpfs/data/oermannlab/users/steelr04/min_inat/logs/inat21__dinov3_vitb16__fn-g1__s2024.log
+inat21__dinov2_vitb14__fn-g1__s2024	running	sp-0014	5	1	2026-07-27T00:45:44	/gpfs/data/oermannlab/users/steelr04/min_inat/logs/inat21__dinov2_vitb14__fn-g1__s2024.log
+inat21__dinov3_vitb16__fn-g1__s31337	running	sp-0014	3	1	2026-07-27T00:45:45	/gpfs/data/oermannlab/users/steelr04/min_inat/logs/inat21__dinov3_vitb16__fn-g1__s31337.log
+inat21__dinov2_vitb14__fn-g1__s31337	running	sp-0014	0	1	2026-07-27T00:45:45	/gpfs/data/oermannlab/users/steelr04/min_inat/logs/inat21__dinov2_vitb14__fn-g1__s31337.log
+inat21__dinov2_vitb14__orig__s42	running	sp-0014	2	1	2026-07-27T00:45:46	/gpfs/data/oermannlab/users/steelr04/min_inat/logs/inat21__dinov2_vitb14__orig__s42.log
+inat21__dinov3_vitl16__orig__s42	running	sp-0014	1	1	2026-07-27T00:45:46	/gpfs/data/oermannlab/users/steelr04/min_inat/logs/inat21__dinov3_vitl16__orig__s42.log
+inat21__dinov3_vitl16__fn-g1__s2024	running	sp-0014	4	1	2026-07-27T00:45:46	/gpfs/data/oermannlab/users/steelr04/min_inat/logs/inat21__dinov3_vitl16__fn-g1__s2024.log
+inat21__dinov3_vitl16__fn-g1__s31337	running	sp-0014	7	1	2026-07-27T00:45:46	/gpfs/data/oermannlab/users/steelr04/min_inat/logs/inat21__dinov3_vitl16__fn-g1__s31337.log
+inat21__dinov3_vitb16__orig__s42	done	sp-0007	7	1	2026-07-27T03:01:03	  FINAL: avg_acc=37.8%  avg_inc_acc=53.0%  bwt=-0.180  task0=45.9%
+inat21__dinov3_vitb16__fn-g1__s42	done	sp-0007	5	1	2026-07-27T03:01:07	  FINAL: avg_acc=64.6%  avg_inc_acc=75.3%  bwt=-0.109  task0=65.5%
+inat21__dinov3_vitb16__fn-g1__s7	done	sp-0007	2	1	2026-07-27T03:01:21	  FINAL: avg_acc=64.7%  avg_inc_acc=75.4%  bwt=-0.112  task0=65.3%
+inat21__dinov3_vitb16__fn-g1__s1993	done	sp-0007	4	1	2026-07-27T03:01:24	  FINAL: avg_acc=64.7%  avg_inc_acc=75.0%  bwt=-0.109  task0=64.9%
+inat21__dinov3_vitb16__fn-g1__s2024	done	sp-0014	6	1	2026-07-27T10:08:24	  FINAL: avg_acc=64.8%  avg_inc_acc=75.1%  bwt=-0.110  task0=65.7%
+inat21__dinov3_vitb16__fn-g1__s31337	done	sp-0014	3	1	2026-07-27T10:08:30	  FINAL: avg_acc=64.6%  avg_inc_acc=75.3%  bwt=-0.110  task0=64.9%
+inat21__dinov2_vitb14__fn-g1__s7	done	sp-0013	2	1	2026-07-27T10:47:08	  FINAL: avg_acc=62.4%  avg_inc_acc=73.6%  bwt=-0.117  task0=62.5%
+inat21__dinov2_vitb14__fn-g1__s1993	done	sp-0013	0	1	2026-07-27T10:49:40	  FINAL: avg_acc=62.4%  avg_inc_acc=73.2%  bwt=-0.115  task0=62.3%
+inat21__dinov2_vitb14__orig__s42	done	sp-0014	2	1	2026-07-27T10:49:43	  FINAL: avg_acc=62.5%  avg_inc_acc=74.7%  bwt=-0.144  task0=67.6%
+inat21__dinov2_vitb14__fn-g1__s42	done	sp-0013	5	1	2026-07-27T10:49:44	  FINAL: avg_acc=62.5%  avg_inc_acc=73.5%  bwt=-0.113  task0=62.9%
+inat21__dinov2_vitb14__fn-g1__s2024	done	sp-0014	5	1	2026-07-27T10:50:55	  FINAL: avg_acc=62.5%  avg_inc_acc=73.4%  bwt=-0.115  task0=62.6%
+inat21__dinov2_vitb14__fn-g1__s31337	done	sp-0014	0	1	2026-07-27T10:55:13	  FINAL: avg_acc=62.5%  avg_inc_acc=73.5%  bwt=-0.115  task0=61.4%

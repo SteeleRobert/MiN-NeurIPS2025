@@ -152,24 +152,48 @@ transfers.
   silently falls back to the mem-efficient/math backend. Switching attention
   implementations buys **nothing** until precision drops. Don't count it twice.
 
-## 6. New Tier 1 candidate found during validation: `cat2order`
+## 6. Two data-path Tier 1 candidates found during validation
 
-`DataManger.map_cat2order` is `self.class_order.index(cat)` — a **linear scan of a
-10,000-element Python list, per label** (`MiN/data_process/data_manger.py:94`).
-`MinNet.cat2order` calls it once per sample, and it runs on the train set *and* the
-cumulative test set at **every** stage, plus again in `after_train`.
+Both are **exactly equivalent** (Tier 1) and neither is implemented here — they were
+found mid-validation, and changing the code under test would invalidate the A/B. Both
+are measured, not estimated.
 
-Cost is O(N·C): ~125 M list-element comparisons for a 25 k train set, and up to ~500 M
-for the 100 k cumulative test set at stage 19 — all single-threaded Python.
+**(a) Eager whole-split JPEG decode — 1.13 h/cell, measured.**
+`split_images_labels` (`data_manger.py`, `mode='1'`) decodes *every* image of a split
+into a 224×224 RGB numpy array held in RAM, via a `Pool(processes=12)`, on every
+`get_task_data` call. That is 4 calls per stage (train, test, train_no_aug, and test
+again in `after_train`), so the **cumulative test set is re-decoded from scratch every
+stage** — ~3.1 M decodes per cell.
 
-**Measured:** during startup all three arms sat at **~100% of exactly one CPU core with
-the GPU at 0% and ~2 KB/s of I/O** for 25+ minutes (`/proc/<pid>/stat` deltas of
-833/889/813 ticks per 8 s). That is this loop, not I/O.
+It conveniently self-reports. From the reference B/16 cell's log:
 
-The fix is a one-line dict: `{cat: i for i, cat in enumerate(class_order)}`, turning
-O(N·C) into O(N). **Exactly equivalent** — same mapping, same order — so it is Tier 1.
-Not implemented here because it was found mid-validation and changing the code under
-test would invalidate the A/B. It should be the next thing done, and it is free.
+```
+$ grep -a "Pool takes" inat21__dinov3_vitb16__fn-g1__s42.log | ...
+  4082 s = 1.13 h over 80 calls          # 80 = 4 calls x 20 stages
+```
+
+`get_pil_img` is deterministic (open → convert RGB → resize 224×224), so a
+path-keyed cache of decoded arrays is exactly equivalent. RAM cost: the full 100 k test
+set at 224×224×3 is ~15 GB — fine on a 2 TB node.
+
+**Scope it correctly before acting:** this cost is *backbone-independent*. It is ~14% of
+a DINOv3-B/16 cell but only **~2.6% of the 43 h H+ cell**. Worth doing, and the single
+biggest data-path win, but it is not what makes H+ viable — §1 is.
+
+**(b) `map_cat2order` linear scan — ~3–4 min/cell.**
+`DataManger.map_cat2order` is `self.class_order.index(cat)` (`data_manger.py:94`) — a
+linear scan of a 10,000-element list, per label, run over the train set and the
+cumulative test set every stage. O(N·C).
+
+Measured in-container: **2.39 s** for a 25 k train set and **9.71 s** for a 100 k
+cumulative test set, per call. The one-line dict
+(`{cat: i for i, cat in enumerate(class_order)}`) is **614× / 805× faster and produces
+a bit-identical mapping** (asserted). Small in absolute terms — a few minutes per cell —
+but free.
+
+> An earlier draft of this section attributed a long GPU-idle startup stall to (b).
+> That was wrong: (b) is ~2 s, and the stall is (a) plus first-touch GPFS latency.
+> Both timings above are direct measurements.
 
 ## 7. Deliberately not done, and why
 
@@ -205,7 +229,8 @@ test would invalidate the A/B. It should be the next thing done, and it is free.
 
 1. `git log --oneline` on `perf/dinov3h-speedup`; read `MiN/utils/perf.py` (~90 lines,
    self-documenting).
-2. Do §6 first — it is free and exactly equivalent.
+2. Do §6(a) first — it is the biggest data-path win and exactly equivalent; §6(b) is
+   free and takes one line.
 3. Run the §4 A/B on any free GPU: `cd /gpfs/.../perf_val && sbatch ab.sbatch`.
 4. If it passes, add the §3 block to the model configs you care about.
 5. Related context: `bigpurple_sweep/HANDOFF.md` (container, HF token, enroot env-var

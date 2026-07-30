@@ -1,0 +1,275 @@
+{
+ "MiN-cifar-10steps-dinov3vitb16-paperhp": {
+  "benchmark": "cifar-100",
+  "backbone": "dinov3_vitb16",
+  "qz_sweep": "dinov3_min_focused",
+  "qz_run_id": "af00f92dfdf2",
+  "overrides": {
+   "batch_size": 512,
+   "init_batch_size": 512,
+   "buffer_batch": 2000,
+   "lr": 5e-05,
+   "gamma": 100,
+   "hidden_dim": 96
+  },
+  "note": "hash-recovered (no config in JSON/manifest)"
+ },
+ "MiN-cifar-10steps-dinov3vitl16-paperhp": {
+  "benchmark": "cifar-100",
+  "backbone": "dinov3_vitl16",
+  "qz_sweep": "all_classes_min_dinov3l",
+  "qz_run_id": "fddf45396a44",
+  "overrides": {
+   "batch_size": 128,
+   "init_batch_size": 128,
+   "buffer_batch": 500,
+   "lr": 5e-05,
+   "gamma": 75,
+   "hidden_dim": 192
+  },
+  "note": ""
+ },
+ "MiN-cifar-10steps-dinov3vith16-paperhp": {
+  "benchmark": "cifar-100",
+  "backbone": "dinov3_vith16",
+  "qz_sweep": "min_dinov3vith16_cifar100_boil",
+  "qz_run_id": "289baabd9b50",
+  "overrides": {
+   "batch_size": 96,
+   "init_batch_size": 96,
+   "buffer_batch": 1000,
+   "lr": 1e-06,
+   "gamma": 10,
+   "hidden_dim": 192,
+   "init_lr": 0.0001,
+   "epochs": 10,
+   "buffer_size": 16384
+  },
+  "note": ""
+ },
+ "MiN-cub-10steps-dinov3vitb16-paperhp": {
+  "benchmark": "cub-200",
+  "backbone": "dinov3_vitb16",
+  "qz_sweep": "dinov3_min_focused",
+  "qz_run_id": "6eb614af33dd",
+  "overrides": {
+   "batch_size": 256,
+   "init_batch_size": 256,
+   "buffer_batch": 1000,
+   "lr": 0.0002,
+   "gamma": 75,
+   "hidden_dim": 192
+  },
+  "note": ""
+ },
+ "MiN-cub-10steps-dinov3vitl16-paperhp": {
+  "benchmark": "cub-200",
+  "backbone": "dinov3_vitl16",
+  "qz_sweep": "all_classes_min_dinov3l",
+  "qz_run_id": "5b8357f64734",
+  "overrides": {
+   "batch_size": 128,
+   "init_batch_size": 128,
+   "buffer_batch": 500,
+   "lr": 5e-05,
+   "gamma": 75,
+   "hidden_dim": 192
+  },
+  "note": ""
+ },
+ "MiN-cub-10steps-dinov3vith16-paperhp": {
+  "benchmark": "cub-200",
+  "backbone": "dinov3_vith16",
+  "qz_sweep": "all_classes_min_dinov3h_sweep",
+  "qz_run_id": "ca3b6a24447b",
+  "overrides": {
+   "batch_size": 64,
+   "init_batch_size": 64,
+   "buffer_batch": 256,
+   "lr": 1e-05,
+   "gamma": 25,
+   "hidden_dim": 192
+  },
+  "note": ""
+ },
+ "MiN-imageneta-dinov3vitb16-paperhp": {
+  "benchmark": "imagenet-a",
+  "backbone": "dinov3_vitb16",
+  "qz_sweep": "dinov3_min_remaining",
+  "qz_run_id": "81636b1fe740",
+  "overrides": {
+   "batch_size": 256,
+   "init_batch_size": 256,
+   "buffer_batch": 1000,
+   "lr": 0.0002,
+   "gamma": 75,
+   "hidden_dim": 192
+  },
+  "note": ""
+ },
+ "MiN-imageneta-dinov3vitl16-paperhp": {
+  "benchmark": "imagenet-a",
+  "backbone": "dinov3_vitl16",
+  "qz_sweep": "all_classes_min_dinov3l",
+  "qz_run_id": "a985397d7e51",
+  "overrides": {
+   "batch_size": 128,
+   "init_batch_size": 128,
+   "buffer_batch": 500,
+   "lr": 5e-05,
+   "gamma": 75,
+   "hidden_dim": 192
+  },
+  "note": ""
+ },
+ "MiN-imageneta-dinov3vith16-paperhp": {
+  "benchmark": "imagenet-a",
+  "backbone": "dinov3_vith16",
+  "qz_sweep": "all_classes_min_dinov3h_sweep",
+  "qz_run_id": "126c1991af0e",
+  "overrides": {
+   "batch_size": 64,
+   "init_batch_size": 64,
+   "buffer_batch": 256,
+   "lr": 1e-05,
+   "gamma": 50,
+   "hidden_dim": 192
+  },
+  "note": ""
+ },
+ "MiN-inr-10steps-dinov3vitb16-paperhp": {
+  "benchmark": "imagenet-r",
+  "backbone": "dinov3_vitb16",
+  "qz_sweep": "dinov3_min_focused",
+  "qz_run_id": "c119cc4410e1",
+  "overrides": {
+   "batch_size": 256,
+   "init_batch_size": 256,
+   "buffer_batch": 1000,
+   "lr": 5e-05,
+   "gamma": 75,
+   "hidden_dim": 192
+  },
+  "note": ""
+ },
+ "MiN-inr-10steps-dinov3vitl16-paperhp": {
+  "benchmark": "imagenet-r",
+  "backbone": "dinov3_vitl16",
+  "qz_sweep": "all_classes_min_dinov3l",
+  "qz_run_id": "87a04be3a554",
+  "overrides": {
+   "batch_size": 128,
+   "init_batch_size": 128,
+   "buffer_batch": 500,
+   "lr": 5e-05,
+   "gamma": 75,
+   "hidden_dim": 192
+  },
+  "note": ""
+ },
+ "MiN-inr-10steps-dinov3vith16-paperhp": {
+  "benchmark": "imagenet-r",
+  "backbone": "dinov3_vith16",
+  "qz_sweep": "all_classes_min_dinov3h",
+  "qz_run_id": "f912d4b7b518",
+  "overrides": {
+   "batch_size": 64,
+   "init_batch_size": 64,
+   "buffer_batch": 256,
+   "lr": 5e-05,
+   "gamma": 75,
+   "hidden_dim": 192
+  },
+  "note": ""
+ },
+ "MiN-omni-10steps-dinov3vitb16-paperhp": {
+  "benchmark": "omnibenchmark",
+  "backbone": "dinov3_vitb16",
+  "qz_sweep": "omni_min_sweep",
+  "qz_run_id": "3467206b03bf",
+  "overrides": {
+   "batch_size": 256,
+   "init_batch_size": 256,
+   "buffer_batch": 1000,
+   "lr": 5e-05,
+   "gamma": 50,
+   "hidden_dim": 48
+  },
+  "note": ""
+ },
+ "MiN-omni-10steps-dinov3vitl16-paperhp": {
+  "benchmark": "omnibenchmark",
+  "backbone": "dinov3_vitl16",
+  "qz_sweep": "all_classes_min_dinov3l",
+  "qz_run_id": "5ba8ece594d7",
+  "overrides": {
+   "batch_size": 128,
+   "init_batch_size": 128,
+   "buffer_batch": 500,
+   "lr": 5e-05,
+   "gamma": 75,
+   "hidden_dim": 192
+  },
+  "note": ""
+ },
+ "MiN-omni-10steps-dinov3vith16-paperhp": {
+  "benchmark": "omnibenchmark",
+  "backbone": "dinov3_vith16",
+  "qz_sweep": "all_classes_min_dinov3h_sweep",
+  "qz_run_id": "3677ab51f933",
+  "overrides": {
+   "batch_size": 64,
+   "init_batch_size": 64,
+   "buffer_batch": 256,
+   "lr": 5e-05,
+   "gamma": 50,
+   "hidden_dim": 192
+  },
+  "note": ""
+ },
+ "MiN-vtab-5steps-dinov3vitb16-paperhp": {
+  "benchmark": "vtab",
+  "backbone": "dinov3_vitb16",
+  "qz_sweep": "dinov3_min_remaining",
+  "qz_run_id": "f1befbc81767",
+  "overrides": {
+   "batch_size": 256,
+   "init_batch_size": 256,
+   "buffer_batch": 1000,
+   "lr": 0.0001,
+   "gamma": 75,
+   "hidden_dim": 384
+  },
+  "note": ""
+ },
+ "MiN-vtab-5steps-dinov3vitl16-paperhp": {
+  "benchmark": "vtab",
+  "backbone": "dinov3_vitl16",
+  "qz_sweep": "all_classes_min_dinov3l",
+  "qz_run_id": "40ff06a85884",
+  "overrides": {
+   "batch_size": 128,
+   "init_batch_size": 128,
+   "buffer_batch": 500,
+   "lr": 5e-05,
+   "gamma": 75,
+   "hidden_dim": 192
+  },
+  "note": ""
+ },
+ "MiN-vtab-5steps-dinov3vith16-paperhp": {
+  "benchmark": "vtab",
+  "backbone": "dinov3_vith16",
+  "qz_sweep": "all_classes_min_dinov3h_sweep",
+  "qz_run_id": "8a0c2392da30",
+  "overrides": {
+   "batch_size": 64,
+   "init_batch_size": 64,
+   "buffer_batch": 256,
+   "lr": 5e-05,
+   "gamma": 25,
+   "hidden_dim": 192
+  },
+  "note": ""
+ }
+}

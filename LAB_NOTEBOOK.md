@@ -107,6 +107,41 @@ accuracies must match the published full runs for same (config, seed).
 Plan: 2-3-stage probes on cifar-100 × {v3-B, v3-L} × 5 seeds (published
 config lr=0.001, γ=100) — 10 runs, ~4-6 GPU·h total — to discriminate H1-H3.
 
+**6. Variant-stability mining (rebut_min_cells.csv, local).** On cifar/v3-B:
+the γ-only ladder without feature norm is unstable at EVERY γ (g100…g500000:
+sd 12-39, collapses at each), while L2 feature norm stabilizes at every γ
+tried (0.1, 0.3, 1, 10, 100, 500: 0 collapses) — γ:XᵀX ratio alone is NOT the
+stability factor. On cifar/v3-L: published is stable-ish (76.5±1.9), fn-g1
+DEstabilizes (54.3±9.3), and fn-g1-lr1e4 rescues to 93.04±0.07 — numerically
+identical to noiseoff-fn-g1 (93.00±0.07); same pattern on omni (85.13≈85.01).
+So at noise-lr 1e-4 the noise mechanism contributes ~nothing, and at the
+published 1e-3 it is the destabilizer once features are normalized. Even on
+v3-B the residual variance under fn tracks noise-lr (fn-g1 sd 4.61 vs
+fn-g1-lr3e4 sd 0.12).
+
+**Working mechanism hypothesis (pre-instrumentation).** Collapse is driven by
+noise-adapter feature drift per stage, whose magnitude is set by the noise
+learning rate × gradient scale relative to feature magnitude in the buffer
+projection; the analytic head cannot follow drift because it only refits on
+current-task data (and actively suppresses old-class logits on overlapping
+subspace). γ mis-scale matters mainly through the logits1 term in the noise
+loss (gradient scale), not RLS conditioning. B-vs-L asymmetry: candidate
+carriers are (a) per-block gradient scale (12 vs 24 adapters), (b) feature
+norm heterogeneity/anisotropy (mean norms match, tails may not — B per-dim
+absmax 1.91 vs L 1.69), (c) task-0 LayerNorm training distortion. Probe runs
+will discriminate.
+
+**Registered predictions (falsifiable, before Goal-1 results):**
+  P1. In the Goal-1 paperhp sweep, cells with min_lr ≤ 5e-05 will show few or
+      no collapses across seeds; the B cells with lr = 2e-04 (cub-B, ina-B)
+      are the most likely to be seed-unstable.
+  P2. The probe will show per-stage old-probe feature drift in collapsing
+      (B, seed) pairs ≫ non-collapsing pairs at the same HPs, visible already
+      at stage 1, and drift magnitude will scale ~linearly with min_lr.
+  P3. A "baseline + low min_lr" config (no feature norm, γ published) will be
+      substantially more seed-stable than published on v3-B cifar/omni — the
+      core Goal-3 candidate direction.
+
 **Blocked on:** BigPurple SSH (VPN down since ~mid-session; monitor armed).
 Pending when back: noise-loss trajectories from the 120 existing logs
 (parse_noise_loss.sh), min_diag_conditioning.py retrieval, diag job

@@ -142,7 +142,59 @@ will discriminate.
       substantially more seed-stable than published on v3-B cifar/omni — the
       core Goal-3 candidate direction.
 
-**Blocked on:** BigPurple SSH (VPN down since ~mid-session; monitor armed).
-Pending when back: noise-loss trajectories from the 120 existing logs
-(parse_noise_loss.sh), min_diag_conditioning.py retrieval, diag job
-submission chained after 25969625.
+## 2026-07-30 (later) — Goal-2 BREAKTHROUGH: the bifurcation is at task 0
+
+SSH restored. Chain REORDERED so the small diag job runs before the 48h
+paperhp sweep: 25969200 (min_dinov2, running) → 25969090 (min_inat_lh) →
+**25971966 (min_stab_diag, 12h)** → **25971981 (min_dinov3_paperhp, 48h)**.
+(Old paperhp job 25969625 cancelled by me; diag dependency repointed to
+25969090 via scontrol so it cannot jump ahead of min_inat_lh.)
+
+**Task-0 training curves from the 120 published-run logs** (worker stdout
+retains every tqdm epoch line via \r; `tr '\r' '\n'` recovers them):
+
+- cifar/v3-B, ALL 5 seeds: normal convergence for 2-3 epochs (→83-92% train
+  acc) then a **loss blow-up at epoch 3-4**. The one surviving seed (2024)
+  dips 89→69 and recovers to ~87%; the 4 collapsing seeds crash to ~20-30%
+  (≈ chance = 20%) and never recover (final 28-58%).
+- cifar/v3-L, ALL 5 seeds: smooth, no dips, final 90-95%. Zero blow-ups.
+- cifar/v3-H: blow-ups on 5/5 (epochs 2-7).
+- Stage-0 EVAL is 100% in every run regardless — the 16384-dim analytic head
+  interpolates 5 classes perfectly even on wrecked features, so the standard
+  metrics are blind to the failure until task 1 arrives.
+
+**Quantitative rule across all 120 runs** (task-0 per-epoch trajectories):
+blow-up (>25pp drop from running max) AND no recovery (final >15pp below
+peak) catches **21/27 collapses with 1/93 false alarms** (the false alarm,
+omni-H s2024 @ 42.7 final, is itself borderline). The 6 uncaught collapses
+are all v3-H on imagenet-a/vtab — a second, H-specific mode.
+
+**Two collapse modes:**
+- **Mode A (21/27; includes 6/6 of v3-B's collapses):** first-session
+  (task-0) optimization blow-up while training LayerNorms + adapter MLPs +
+  normal_fc with SGD-momentum at init_lr=1e-3. Features wrecked → analytic
+  head goes recency-only from stage 1-2.
+- **Mode B (6/27; v3-H only):** task-0 survives, but incremental noise
+  training fails to learn new tasks (e.g. imagenet-r/v3-H: T1@s1=0), then
+  pure-recency wipe-out. Likely the same instability surfacing in the
+  incremental phase (lr=1e-3) instead.
+
+**Answer shape for the B-vs-L puzzle:** v3-B sits at the edge of optimization
+stability at init_lr=1e-3 (every cifar seed spikes at epoch 3-4; severity and
+recovery are seed-dependent → bimodal outcome); v3-L is comfortably inside
+the stable region (zero spikes anywhere). Static feature statistics can't
+separate them because the operative quantity is optimization dynamics
+(gradient scale / curvature of the LN+adapter system), not feature norms.
+The instrumented probes (now with per-step per-group gradient norms and
+LayerNorm-drift tracking) will identify the carrier.
+
+**Goal-3 implication (registered as P4):** `init_lr` — explicitly inside the
+allowed knob space ("init settings") — is the primary stabilizer for Mode A;
+lowering it to 3e-4/1e-4 should eliminate B's blow-ups. The cifar/v3-H "boil"
+winner already used init_lr=1e-4 (the original sweep found this without
+knowing why). `lr` is the corresponding lever for Mode B. Diag queue extended
+with an init_lr ladder (ilr3e4/ilr1e4 × 4 seeds, 3-stage probes): 44 rows.
+
+**Evidence inventory for the milestone report:** task-0 curves (all 120),
+blow-up rule stats, mode taxonomy, chain state. Probe-based gradient
+evidence lands when 25971966 runs (~2.5 days).

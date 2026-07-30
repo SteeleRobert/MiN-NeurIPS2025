@@ -34,3 +34,11 @@ mech__omniB__s7	omnibenchmark_ease	MiN-omni-10steps-dinov3vitb16	7	3	eig
 mech__omniB__s42	omnibenchmark_ease	MiN-omni-10steps-dinov3vitb16	42	3	eig
 mech__omniL__s7	omnibenchmark_ease	MiN-omni-10steps-dinov3vitl16	7	3	eig
 mech__omniL__s42	omnibenchmark_ease	MiN-omni-10steps-dinov3vitl16	42	3	eig
+ilrlad__ilr3e4__s7	cifar_ease	MiN-cifar-10steps-dinov3vitb16-ilr3e4	7	3	
+ilrlad__ilr3e4__s42	cifar_ease	MiN-cifar-10steps-dinov3vitb16-ilr3e4	42	3	
+ilrlad__ilr3e4__s1993	cifar_ease	MiN-cifar-10steps-dinov3vitb16-ilr3e4	1993	3	
+ilrlad__ilr3e4__s31337	cifar_ease	MiN-cifar-10steps-dinov3vitb16-ilr3e4	31337	3	
+ilrlad__ilr1e4__s7	cifar_ease	MiN-cifar-10steps-dinov3vitb16-ilr1e4	7	3	
+ilrlad__ilr1e4__s42	cifar_ease	MiN-cifar-10steps-dinov3vitb16-ilr1e4	42	3	
+ilrlad__ilr1e4__s1993	cifar_ease	MiN-cifar-10steps-dinov3vitb16-ilr1e4	1993	3	
+ilrlad__ilr1e4__s31337	cifar_ease	MiN-cifar-10steps-dinov3vitb16-ilr1e4	31337	3	

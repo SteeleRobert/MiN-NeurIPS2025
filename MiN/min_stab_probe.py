@@ -61,6 +61,10 @@ class ProbeRecorder(object):
         self.prev_feats = {}        # probe_name -> last feature snapshot (cpu)
         self.probes = {}            # probe_name -> (loader, class_list_orders)
         self.phase_ctr = 0
+        # reference copy of trainable backbone params (LayerNorms etc.) at t=0
+        self.init_params = {n: p.detach().clone()
+                            for n, p in self.net.named_parameters()
+                            if 'norm' in n and 'noise_maker' not in n} if measure else {}
 
     def log(self, rec):
         rec['t'] = time.time()
@@ -116,6 +120,16 @@ class ProbeRecorder(object):
             ev = torch.linalg.eigvalsh(R)
             q = torch.tensor([0.0, 0.01, 0.1, 0.25, 0.5, 0.75, 0.9, 0.99, 1.0], dtype=ev.dtype, device=ev.device)
             rec['R_eig_quantiles'] = [float(x) for x in torch.quantile(ev, q)]
+
+        # LayerNorm drift from pretrained init
+        if self.init_params:
+            d2, n2 = 0.0, 0.0
+            for n, p in net.named_parameters():
+                if n in self.init_params:
+                    ref = self.init_params[n]
+                    d2 += float((p.detach() - ref).norm())**2
+                    n2 += float(ref.norm())**2
+            rec['ln_drift_rel'] = (d2**0.5) / max(n2**0.5, 1e-9)
 
         # weight_noise mixtures (first/last block)
         try:
@@ -185,6 +199,44 @@ class ProbeRecorder(object):
         self.log(rec)
 
 
+def install_grad_recorder(rec):
+    """Wrap MiN's get_optimizer so every optimizer.step() first records per-group
+    gradient norms (read-only: grads are only read, never modified)."""
+    import models.MiN as MiNmod
+    orig_go = MiNmod.get_optimizer
+    state = {'step': 0}
+
+    def categorize(name):
+        if 'normal_fc' in name: return 'normal_fc'
+        if 'mu' in name or 'sigmma' in name: return 'noise_pair'
+        if 'noise_maker' in name: return 'adapter_mlp'
+        if 'norm' in name: return 'layernorm'
+        return 'other'
+
+    def wrapped_go(*a, **kw):
+        opt = orig_go(*a, **kw)
+        orig_step = opt.step
+        def step(*sa, **skw):
+            if rec.measure:
+                g2 = {}
+                mx = {}
+                for n, p in rec.net.named_parameters():
+                    if p.grad is None or not p.requires_grad: continue
+                    c = categorize(n)
+                    v = float(p.grad.detach().norm())
+                    g2[c] = g2.get(c, 0.0) + v*v
+                    mx[c] = max(mx.get(c, 0.0), v)
+                state['step'] += 1
+                rec.log({'phase': 'grad', 'cur_task': rec.model.cur_task,
+                         'step': state['step'],
+                         'gnorm': {k: round(v**0.5, 6) for k, v in g2.items()},
+                         'gmax': {k: round(v, 6) for k, v in mx.items()}})
+            return orig_step(*sa, **skw)
+        opt.step = step
+        return opt
+    MiNmod.get_optimizer = wrapped_go
+
+
 def install_wrappers(model, rec):
     """Wrap MinNet phase methods; originals run unchanged, snapshots fire around them."""
     for name in ('fit_fc', 're_fit', 'run'):
@@ -251,7 +303,9 @@ def main():
     if opts.measure:
         rec.add_probe('t0_train', 0)
         rec.add_test_probe('t0_test', 0)
+        rec.snapshot('pre_train')
     install_wrappers(model, rec)
+    install_grad_recorder(rec)
 
     history = []
     model.init_train(data_manger=datamanger)

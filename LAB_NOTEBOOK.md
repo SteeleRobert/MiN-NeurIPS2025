@@ -199,6 +199,16 @@ with an init_lr ladder (ilr3e4/ilr1e4 × 4 seeds, 3-stage probes): 44 rows.
 blow-up rule stats, mode taxonomy, chain state. Probe-based gradient
 evidence lands when 25971966 runs (~2.5 days).
 
+## 2026-07-30 (night) — chain change by Robert's order (via manager)
+
+min_inat_lh de-scoped and cancelled by Robert (9 stale claims in its queue if
+resurrected). Manager cancelled my min_stab_diag 25971966 so the original-HP
+sweeps complete first. New chain: **25971981 min_dinov3_paperhp (RUNNING —
+Goal-1 ~2 days early)** → 25973957 min_vit_paperhp (manager's, original-ViT
+per-cell paper HPs) → **25974300 min_stab_diag (resubmitted by me,
+afterany:25973957)**. Standing rule: no chain reorders without checking with
+the manager first. P4 remains registered and untested until diag runs.
+
 ## 2026-07-30 (evening) — chain progressed; DINOv2 paperhp baseline complete
 
 min_dinov2 (25969200) drained clean: 30/30 done, 0 failures, ~3h wall.

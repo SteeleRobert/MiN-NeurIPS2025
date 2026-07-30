@@ -199,6 +199,22 @@ with an init_lr ladder (ilr3e4/ilr1e4 × 4 seeds, 3-stage probes): 44 rows.
 blow-up rule stats, mode taxonomy, chain state. Probe-based gradient
 evidence lands when 25971966 runs (~2.5 days).
 
+## 2026-07-30 (evening) — chain progressed; DINOv2 paperhp baseline complete
+
+min_dinov2 (25969200) drained clean: 30/30 done, 0 failures, ~3h wall.
+min_inat_lh (25969090) now RUNNING on sp-0014. A new job appeared behind
+mine: 25973957 `min_vit_paperhp` (another session's original-ViT paperhp
+sweep), chained afterany:25971981 — no conflict.
+
+**DINOv2 paperhp results (context for Goal-1's expected outcome):** per-cell
+winners are seed-STABLE everywhere — cifar 90.75±0.84, cub 90.91±0.35,
+ina 75.41±0.79, inr 87.79±0.38, omni 79.52±1.34, vtab 95.34±0.55; zero
+collapses — despite noise-lr up to 1e-3. So the edge-of-stability pathology
+is specific to DINOv3-B/H checkpoints, not to MiN's protocol per se, and not
+to DINOv2 (nor DINOv3-L). Sharpens the Goal-1 question: do the DINOv3
+per-cell winners (mostly lr 5e-05 but init_lr still 1e-3, except the cifar-H
+boil cell at 1e-4) inherit Mode-A blow-up risk through init_lr?
+
 **omni-B addendum (worker logs, init_epochs=20 — definitive):** every omni-B
 seed except 31337 hits a dip/blow-up somewhere in epochs 8-14; the two
 collapsed seeds (1993: 90.3%→6.5 at ep14; 7: 91.3%→31→3.7 at ep11) never

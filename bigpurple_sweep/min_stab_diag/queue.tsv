@@ -1,0 +1,36 @@
+val__cifarB__s7__nomeasure	cifar_ease	MiN-cifar-10steps-dinov3vitb16	7	3	no-measure
+val__cifarB__s7__measA	cifar_ease	MiN-cifar-10steps-dinov3vitb16	7	3	eig
+val__cifarB__s7__measB	cifar_ease	MiN-cifar-10steps-dinov3vitb16	7	3	eig
+mech__cifarB__s1993	cifar_ease	MiN-cifar-10steps-dinov3vitb16	1993	3	eig
+mech__cifarB__s42	cifar_ease	MiN-cifar-10steps-dinov3vitb16	42	3	eig
+mech__cifarB__s2024	cifar_ease	MiN-cifar-10steps-dinov3vitb16	2024	3	eig
+mech__cifarB__s31337	cifar_ease	MiN-cifar-10steps-dinov3vitb16	31337	3	eig
+mech__cifarL__s1993	cifar_ease	MiN-cifar-10steps-dinov3vitl16	1993	3	eig
+mech__cifarL__s42	cifar_ease	MiN-cifar-10steps-dinov3vitl16	42	3	eig
+mech__cifarL__s7	cifar_ease	MiN-cifar-10steps-dinov3vitl16	7	3	eig
+mech__cifarL__s2024	cifar_ease	MiN-cifar-10steps-dinov3vitl16	2024	3	eig
+mech__cifarL__s31337	cifar_ease	MiN-cifar-10steps-dinov3vitl16	31337	3	eig
+lrlad__lr3e4__s7	cifar_ease	MiN-cifar-10steps-dinov3vitb16-lr3e4	7	3	
+lrlad__lr3e4__s42	cifar_ease	MiN-cifar-10steps-dinov3vitb16-lr3e4	42	3	
+lrlad__lr3e4__s1993	cifar_ease	MiN-cifar-10steps-dinov3vitb16-lr3e4	1993	3	
+lrlad__lr1e4__s7	cifar_ease	MiN-cifar-10steps-dinov3vitb16-lr1e4	7	3	
+lrlad__lr1e4__s42	cifar_ease	MiN-cifar-10steps-dinov3vitb16-lr1e4	42	3	
+lrlad__lr1e4__s1993	cifar_ease	MiN-cifar-10steps-dinov3vitb16-lr1e4	1993	3	
+lrlad__lr3e5__s7	cifar_ease	MiN-cifar-10steps-dinov3vitb16-lr3e5	7	3	
+lrlad__lr3e5__s42	cifar_ease	MiN-cifar-10steps-dinov3vitb16-lr3e5	42	3	
+lrlad__lr3e5__s1993	cifar_ease	MiN-cifar-10steps-dinov3vitb16-lr3e5	1993	3	
+lrlad__lr1e5__s7	cifar_ease	MiN-cifar-10steps-dinov3vitb16-lr1e5	7	3	
+lrlad__lr1e5__s42	cifar_ease	MiN-cifar-10steps-dinov3vitb16-lr1e5	42	3	
+lrlad__lr1e5__s1993	cifar_ease	MiN-cifar-10steps-dinov3vitb16-lr1e5	1993	3	
+xseed__cifarB__s11	cifar_ease	MiN-cifar-10steps-dinov3vitb16	11	3	
+xseed__cifarB__s13	cifar_ease	MiN-cifar-10steps-dinov3vitb16	13	3	
+xseed__cifarB__s17	cifar_ease	MiN-cifar-10steps-dinov3vitb16	17	3	
+xseed__cifarB__s19	cifar_ease	MiN-cifar-10steps-dinov3vitb16	19	3	
+xseed__cifarB__s23	cifar_ease	MiN-cifar-10steps-dinov3vitb16	23	3	
+xseed__cifarB__s29	cifar_ease	MiN-cifar-10steps-dinov3vitb16	29	3	
+xseed__cifarB__s101	cifar_ease	MiN-cifar-10steps-dinov3vitb16	101	3	
+xseed__cifarB__s202	cifar_ease	MiN-cifar-10steps-dinov3vitb16	202	3	
+mech__omniB__s7	omnibenchmark_ease	MiN-omni-10steps-dinov3vitb16	7	3	eig
+mech__omniB__s42	omnibenchmark_ease	MiN-omni-10steps-dinov3vitb16	42	3	eig
+mech__omniL__s7	omnibenchmark_ease	MiN-omni-10steps-dinov3vitl16	7	3	eig
+mech__omniL__s42	omnibenchmark_ease	MiN-omni-10steps-dinov3vitl16	42	3	eig

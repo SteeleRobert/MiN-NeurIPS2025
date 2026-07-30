@@ -198,3 +198,10 @@ with an init_lr ladder (ilr3e4/ilr1e4 × 4 seeds, 3-stage probes): 44 rows.
 **Evidence inventory for the milestone report:** task-0 curves (all 120),
 blow-up rule stats, mode taxonomy, chain state. Probe-based gradient
 evidence lands when 25971966 runs (~2.5 days).
+
+**omni-B addendum (worker logs, init_epochs=20 — definitive):** every omni-B
+seed except 31337 hits a dip/blow-up somewhere in epochs 8-14; the two
+collapsed seeds (1993: 90.3%→6.5 at ep14; 7: 91.3%→31→3.7 at ep11) never
+recover, the two dippers that recovered (2024, 42) survive. Blow-ups strike
+at ANY epoch, late included — so init_epochs (omni stock = 20) also modulates
+exposure. Confirms Mode A generalizes beyond cifar; survival == recovery.

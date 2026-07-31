@@ -239,3 +239,21 @@ workers against the shared min_dinov3_paperhp queue — the atomic-mkdir claims
 machinery absorbed it natively (no duplicate claims). 10/90 done, 0 failures,
 16 GPUs active. ETA ~15-20h. (sp-0010 was allocated by Robert's side, not by
 this worker — my jobs remain sp-0014-only per the resource rules.)
+
+## 2026-07-31 — Goal-1 early H-tier results (27/90 done, 0 failures)
+
+| cell | mean±sd | ncol | s1993 vs paper | verdict |
+|---|---|---|---|---|
+| cifar-H | 88.21±6.61 | 0 | 76.7 / 84.4 | ROUGH (stable!) |
+| cub-L | 91.75±0.18 | 0 | 91.65 / 91.66 | REPRODUCED |
+| cub-H | 73.03±36.92 | 1 | 89.9 / 89.0 | repro but lucky-seed |
+| ina-H | 32.08±14.88 | 4 | 16.2 / 64.3 | IRREPRODUCIBLE |
+| inr-H | 15.86±18.89 (n=3) | 3 | 5.1 / 53.7 | IRREPRODUCIBLE |
+| vtab-H | 51.57±23.21 | 3 | 70.7 / 95.3 | IRREPRODUCIBLE |
+
+Headline: **cifar-H — the only winner with init_lr=1e-4 — is the only stable
+H cell** (P4 corroborated from independent data). ina/vtab-H paper values are
+unreachable even by the best of 5 seeds (51.0 / 81.6 vs 64.3 / 95.3); caveat:
+qz-harness vs MiN-pipeline test-split offsets apply to ina/inr (and partly
+vtab) level comparisons, not to sd/collapse counts. Flagged to manager per
+reporting rule 5.

@@ -257,3 +257,15 @@ unreachable even by the best of 5 seeds (51.0 / 81.6 vs 64.3 / 95.3); caveat:
 qz-harness vs MiN-pipeline test-split offsets apply to ina/inr (and partly
 vtab) level comparisons, not to sd/collapse counts. Flagged to manager per
 reporting rule 5.
+
+## 2026-07-31 — de-scope directive (Robert, via manager)
+
+Both cancellations intentional: Robert de-scoped everything except the
+original-HP reruns ("I just want the original HPs to be rerun").
+min_vit_paperhp cancelled while pending (hence absent from sacct);
+min_stab_diag deferred INDEFINITELY pending Robert's explicit go — do not
+resubmit. After the two dinov3 paperhp node jobs drain, cluster footprint
+goes to zero. Goal-2 instrumented evidence (P4 direct test, gradient carrier,
+hook validation) and Goal-3 screening compute are paused with it. Continuing:
+Goal-1 aggregation + CPU-free analysis only. The Goal-1 report must include a
+"what the diag would settle" paragraph (~10 GPU-h ask) for Robert's go/no-go.

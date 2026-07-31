@@ -269,3 +269,54 @@ goes to zero. Goal-2 instrumented evidence (P4 direct test, gradient carrier,
 hook validation) and Goal-3 screening compute are paused with it. Continuing:
 Goal-1 aggregation + CPU-free analysis only. The Goal-1 report must include a
 "what the diag would settle" paragraph (~10 GPU-h ask) for Robert's go/no-go.
+
+## 2026-07-31 — GOAL-1 COMPLETE: 90/90, 0 failures. Per-cell verdict.
+
+| cell | mean±sd | collapses | s1993 vs paper | verdict |
+|---|---|---|---|---|
+| cifar-B | 87.82±1.93 | 0/5 | 85.1 / 84.8 | REPRODUCED |
+| cub-B | 90.79±0.22 | 0/5 | 91.0 / 91.1 | REPRODUCED |
+| ina-B | 72.65±0.50 | 0/5 | 72.1 / 76.1 | ROUGH (stable; likely split offset) |
+| inr-B | 89.48±0.34 | 0/5 | 89.8 / 88.8 | REPRODUCED |
+| omni-B | 81.25±0.69 | 0/5 | 80.7 / 82.1 | REPRODUCED |
+| vtab-B | 94.81±0.71 | 0/5 | 95.1 / 95.1 | REPRODUCED |
+| cifar-L | 84.26±2.01 | 0/5 | 81.5 / 82.3 | REPRODUCED |
+| cub-L | 91.80±0.20 | 0/5 | 91.7 / 91.7 | REPRODUCED |
+| ina-L | 82.72±1.67 | 0/5 | 84.0 / 82.9 | REPRODUCED |
+| inr-L | 91.26±1.03 | 0/5 | 92.5 / 89.9 | REPRODUCED |
+| omni-L | 79.46±1.12 | 0/5 | 79.9 / 80.4 | REPRODUCED |
+| vtab-L | 94.55±1.12 | 0/5 | 94.9 / 95.4 | REPRODUCED |
+| cifar-H | 88.21±6.61 | 0/5 | 76.7 / 84.4 | ROUGH (stable — init_lr=1e-4 cell) |
+| cub-H | 73.03±36.92 | 1/5 | 89.9 / 89.0 | repro at 1993, LUCKY-SEED cell |
+| ina-H | 32.08±14.88 | 4/5 | 16.2 / 64.3 | IRREPRODUCIBLE |
+| inr-H | 21.21±22.72 | 4/5 | 5.1 / 53.7 | IRREPRODUCIBLE |
+| omni-H | 17.30±4.52 | 5/5 | 18.0 / 53.9 | IRREPRODUCIBLE (max 23.0 < paper) |
+| vtab-H | 51.57±23.21 | 3/5 | 70.7 / 95.3 | IRREPRODUCIBLE |
+
+**Headlines.**
+1. Collapse frequency by backbone: **B 0/30, L 0/30, H 13/30.** The paper's
+   per-cell winners fully stabilize B and L; H remains fundamentally
+   seed-unstable except cifar-H.
+2. The two stable-H facts point the same way: cifar-H is the only H winner
+   with init_lr=1e-4 (0/5 collapse); every other H winner kept init_lr=1e-3
+   with small batches (64/96) and collapses on 1-5 of 5 seeds.
+3. **Mechanism wrinkle discovered by P1 failing:** B winners kept
+   init_lr=1e-3 — same as the collapsing stock configs — yet 0/30 collapse.
+   The only task-0-relevant knobs they changed: init_batch_size
+   (64/128 → 256/512) and, in 2 cells, hidden_dim (192 → 96/48). By the Mode-A
+   account (task-0 blow-up), the batch increase (2-8× fewer, less noisy steps)
+   is the likely stabilizer — but this is exactly what the paused diag's
+   ladder would disentangle (init_lr vs init_batch_size vs hidden_dim).
+4. Prediction scoring (registered 2026-07-30): P1 HALF-WRONG both ways —
+   lr=2e-4 B cells are stable (batch effect dominates), and low-lr H cells
+   still collapse (init_lr=1e-3 + small batch dominates). The refined claim —
+   task-0 knobs (init_lr, init_batch) decide Mode A; incremental lr decides
+   Mode B — explains both misses and all 18 outcomes. P2/P3/P4 untested
+   (diag paused).
+5. Goal-3 status implied by Goal-1: for B and L the original tuning
+   methodology ALREADY reaches seed-stability (sd ≤ 2pp on 11/12 cells;
+   means within ~2pp of the repaired per-cell best on 8/12, ABOVE it on 3).
+   Residual gaps vs repaired-best on cifar-L (-8.7pp), omni-L (-5.7), inr-L
+   (-3.4) are where noise-lr-lowered variants beat the original space so far.
+   For H, the open question is whether cifar-H-style init settings rescue the
+   other 5 cells (P4's direct test — paused with the diag).

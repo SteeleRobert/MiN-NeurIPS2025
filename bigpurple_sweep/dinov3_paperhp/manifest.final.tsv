@@ -1,0 +1,182 @@
+cifar-100__dinov3_vith16__paperhp__s7	running	sp-0014	0	1	2026-07-30T17:45:33	/gpfs/data/oermannlab/users/steelr04/min_dinov3_paperhp/logs/cifar-100__dinov3_vith16__paperhp__s7.log
+cifar-100__dinov3_vith16__paperhp__s42	running	sp-0014	3	1	2026-07-30T17:45:33	/gpfs/data/oermannlab/users/steelr04/min_dinov3_paperhp/logs/cifar-100__dinov3_vith16__paperhp__s42.log
+cifar-100__dinov3_vith16__paperhp__s1993	running	sp-0014	4	1	2026-07-30T17:45:33	/gpfs/data/oermannlab/users/steelr04/min_dinov3_paperhp/logs/cifar-100__dinov3_vith16__paperhp__s1993.log
+cifar-100__dinov3_vith16__paperhp__s2024	running	sp-0014	2	1	2026-07-30T17:45:33	/gpfs/data/oermannlab/users/steelr04/min_dinov3_paperhp/logs/cifar-100__dinov3_vith16__paperhp__s2024.log
+cifar-100__dinov3_vith16__paperhp__s31337	running	sp-0014	1	1	2026-07-30T17:45:33	/gpfs/data/oermannlab/users/steelr04/min_dinov3_paperhp/logs/cifar-100__dinov3_vith16__paperhp__s31337.log
+cub-200__dinov3_vith16__paperhp__s7	running	sp-0014	7	1	2026-07-30T17:45:33	/gpfs/data/oermannlab/users/steelr04/min_dinov3_paperhp/logs/cub-200__dinov3_vith16__paperhp__s7.log
+cub-200__dinov3_vith16__paperhp__s42	running	sp-0014	6	1	2026-07-30T17:45:33	/gpfs/data/oermannlab/users/steelr04/min_dinov3_paperhp/logs/cub-200__dinov3_vith16__paperhp__s42.log
+cub-200__dinov3_vith16__paperhp__s1993	running	sp-0014	5	1	2026-07-30T17:45:33	/gpfs/data/oermannlab/users/steelr04/min_dinov3_paperhp/logs/cub-200__dinov3_vith16__paperhp__s1993.log
+cub-200__dinov3_vith16__paperhp__s1993	done	sp-0014	5	1	2026-07-30T18:48:41	  FINAL: avg_acc=89.9%  avg_inc_acc=93.7%  bwt=-0.041  task0=84.2%
+cub-200__dinov3_vith16__paperhp__s2024	running	sp-0014	5	1	2026-07-30T18:48:41	/gpfs/data/oermannlab/users/steelr04/min_dinov3_paperhp/logs/cub-200__dinov3_vith16__paperhp__s2024.log
+cub-200__dinov3_vith16__paperhp__s42	done	sp-0014	6	1	2026-07-30T18:48:47	  FINAL: avg_acc=7.0%  avg_inc_acc=21.7%  bwt=-0.204  task0=0.7%
+cub-200__dinov3_vith16__paperhp__s31337	running	sp-0014	6	1	2026-07-30T18:48:47	/gpfs/data/oermannlab/users/steelr04/min_dinov3_paperhp/logs/cub-200__dinov3_vith16__paperhp__s31337.log
+cub-200__dinov3_vith16__paperhp__s7	done	sp-0014	7	1	2026-07-30T18:48:57	  FINAL: avg_acc=89.5%  avg_inc_acc=94.5%  bwt=-0.049  task0=87.7%
+imagenet-a__dinov3_vith16__paperhp__s7	running	sp-0014	7	1	2026-07-30T18:48:57	/gpfs/data/oermannlab/users/steelr04/min_dinov3_paperhp/logs/imagenet-a__dinov3_vith16__paperhp__s7.log
+imagenet-a__dinov3_vith16__paperhp__s7	done	sp-0014	7	1	2026-07-30T19:26:55	  FINAL: avg_acc=38.4%  avg_inc_acc=54.7%  bwt=-0.171  task0=51.8%
+imagenet-a__dinov3_vith16__paperhp__s42	running	sp-0014	7	1	2026-07-30T19:26:55	/gpfs/data/oermannlab/users/steelr04/min_dinov3_paperhp/logs/imagenet-a__dinov3_vith16__paperhp__s42.log
+cub-200__dinov3_vith16__paperhp__s2024	done	sp-0014	5	1	2026-07-30T19:52:53	  FINAL: avg_acc=89.0%  avg_inc_acc=93.8%  bwt=-0.050  task0=92.6%
+imagenet-a__dinov3_vith16__paperhp__s1993	running	sp-0014	5	1	2026-07-30T19:52:53	/gpfs/data/oermannlab/users/steelr04/min_dinov3_paperhp/logs/imagenet-a__dinov3_vith16__paperhp__s1993.log
+cub-200__dinov3_vith16__paperhp__s31337	done	sp-0014	6	1	2026-07-30T19:52:55	  FINAL: avg_acc=89.8%  avg_inc_acc=92.7%  bwt=-0.039  task0=89.0%
+imagenet-a__dinov3_vith16__paperhp__s2024	running	sp-0014	6	1	2026-07-30T19:52:55	/gpfs/data/oermannlab/users/steelr04/min_dinov3_paperhp/logs/imagenet-a__dinov3_vith16__paperhp__s2024.log
+imagenet-a__dinov3_vith16__paperhp__s42	done	sp-0014	7	1	2026-07-30T20:04:57	  FINAL: avg_acc=17.6%  avg_inc_acc=37.8%  bwt=-0.253  task0=15.2%
+imagenet-a__dinov3_vith16__paperhp__s31337	running	sp-0014	7	1	2026-07-30T20:04:57	/gpfs/data/oermannlab/users/steelr04/min_dinov3_paperhp/logs/imagenet-a__dinov3_vith16__paperhp__s31337.log
+imagenet-a__dinov3_vith16__paperhp__s1993	done	sp-0014	5	1	2026-07-30T20:30:47	  FINAL: avg_acc=16.2%  avg_inc_acc=34.9%  bwt=-0.243  task0=6.9%
+imagenet-r__dinov3_vith16__paperhp__s7	running	sp-0014	5	1	2026-07-30T20:30:47	/gpfs/data/oermannlab/users/steelr04/min_dinov3_paperhp/logs/imagenet-r__dinov3_vith16__paperhp__s7.log
+imagenet-a__dinov3_vith16__paperhp__s2024	done	sp-0014	6	1	2026-07-30T20:30:57	  FINAL: avg_acc=51.0%  avg_inc_acc=66.2%  bwt=-0.116  task0=70.0%
+imagenet-r__dinov3_vith16__paperhp__s42	running	sp-0014	6	1	2026-07-30T20:30:57	/gpfs/data/oermannlab/users/steelr04/min_dinov3_paperhp/logs/imagenet-r__dinov3_vith16__paperhp__s42.log
+imagenet-a__dinov3_vith16__paperhp__s31337	done	sp-0014	7	1	2026-07-30T20:42:57	  FINAL: avg_acc=37.2%  avg_inc_acc=54.4%  bwt=-0.163  task0=54.1%
+imagenet-r__dinov3_vith16__paperhp__s1993	running	sp-0014	7	1	2026-07-30T20:42:57	/gpfs/data/oermannlab/users/steelr04/min_dinov3_paperhp/logs/imagenet-r__dinov3_vith16__paperhp__s1993.log
+imagenet-r__dinov3_vith16__paperhp__s2024	running	sp-0010	4	1	2026-07-30T22:22:18	/gpfs/data/oermannlab/users/steelr04/min_dinov3_paperhp/logs/imagenet-r__dinov3_vith16__paperhp__s2024.log
+omnibenchmark__dinov3_vith16__paperhp__s1993	running	sp-0010	3	1	2026-07-30T22:22:18	/gpfs/data/oermannlab/users/steelr04/min_dinov3_paperhp/logs/omnibenchmark__dinov3_vith16__paperhp__s1993.log
+imagenet-r__dinov3_vith16__paperhp__s31337	running	sp-0010	5	1	2026-07-30T22:22:18	/gpfs/data/oermannlab/users/steelr04/min_dinov3_paperhp/logs/imagenet-r__dinov3_vith16__paperhp__s31337.log
+omnibenchmark__dinov3_vith16__paperhp__s42	running	sp-0010	6	1	2026-07-30T22:22:18	/gpfs/data/oermannlab/users/steelr04/min_dinov3_paperhp/logs/omnibenchmark__dinov3_vith16__paperhp__s42.log
+omnibenchmark__dinov3_vith16__paperhp__s7	running	sp-0010	0	1	2026-07-30T22:22:18	/gpfs/data/oermannlab/users/steelr04/min_dinov3_paperhp/logs/omnibenchmark__dinov3_vith16__paperhp__s7.log
+omnibenchmark__dinov3_vith16__paperhp__s2024	running	sp-0010	7	1	2026-07-30T22:22:18	/gpfs/data/oermannlab/users/steelr04/min_dinov3_paperhp/logs/omnibenchmark__dinov3_vith16__paperhp__s2024.log
+omnibenchmark__dinov3_vith16__paperhp__s31337	running	sp-0010	2	1	2026-07-30T22:22:18	/gpfs/data/oermannlab/users/steelr04/min_dinov3_paperhp/logs/omnibenchmark__dinov3_vith16__paperhp__s31337.log
+vtab__dinov3_vith16__paperhp__s7	running	sp-0010	1	1	2026-07-30T22:22:18	/gpfs/data/oermannlab/users/steelr04/min_dinov3_paperhp/logs/vtab__dinov3_vith16__paperhp__s7.log
+vtab__dinov3_vith16__paperhp__s7	done	sp-0010	1	1	2026-07-30T22:39:26	  FINAL: avg_acc=39.5%  avg_inc_acc=61.9%  bwt=-0.447  task0=27.4%
+vtab__dinov3_vith16__paperhp__s42	running	sp-0010	1	1	2026-07-30T22:39:26	/gpfs/data/oermannlab/users/steelr04/min_dinov3_paperhp/logs/vtab__dinov3_vith16__paperhp__s42.log
+cifar-100__dinov3_vith16__paperhp__s1993	done	sp-0014	4	1	2026-07-30T22:40:57	  FINAL: avg_acc=76.7%  avg_inc_acc=85.2%  bwt=-0.087  task0=92.0%
+vtab__dinov3_vith16__paperhp__s1993	running	sp-0014	4	1	2026-07-30T22:40:57	/gpfs/data/oermannlab/users/steelr04/min_dinov3_paperhp/logs/vtab__dinov3_vith16__paperhp__s1993.log
+cifar-100__dinov3_vith16__paperhp__s31337	done	sp-0014	1	1	2026-07-30T22:41:08	  FINAL: avg_acc=90.8%  avg_inc_acc=95.1%  bwt=-0.038  task0=98.0%
+vtab__dinov3_vith16__paperhp__s2024	running	sp-0014	1	1	2026-07-30T22:41:08	/gpfs/data/oermannlab/users/steelr04/min_dinov3_paperhp/logs/vtab__dinov3_vith16__paperhp__s2024.log
+cifar-100__dinov3_vith16__paperhp__s7	done	sp-0014	0	1	2026-07-30T22:41:37	  FINAL: avg_acc=88.8%  avg_inc_acc=93.1%  bwt=-0.043  task0=94.2%
+vtab__dinov3_vith16__paperhp__s31337	running	sp-0014	0	1	2026-07-30T22:41:37	/gpfs/data/oermannlab/users/steelr04/min_dinov3_paperhp/logs/vtab__dinov3_vith16__paperhp__s31337.log
+cifar-100__dinov3_vith16__paperhp__s42	done	sp-0014	3	1	2026-07-30T22:43:44	  FINAL: avg_acc=92.3%  avg_inc_acc=95.1%  bwt=-0.035  task0=98.6%
+cifar-100__dinov3_vitl16__paperhp__s7	running	sp-0014	3	1	2026-07-30T22:43:44	/gpfs/data/oermannlab/users/steelr04/min_dinov3_paperhp/logs/cifar-100__dinov3_vitl16__paperhp__s7.log
+cifar-100__dinov3_vith16__paperhp__s2024	done	sp-0014	2	1	2026-07-30T22:45:35	  FINAL: avg_acc=92.5%  avg_inc_acc=96.1%  bwt=-0.030  task0=94.2%
+cifar-100__dinov3_vitl16__paperhp__s42	running	sp-0014	2	1	2026-07-30T22:45:35	/gpfs/data/oermannlab/users/steelr04/min_dinov3_paperhp/logs/cifar-100__dinov3_vitl16__paperhp__s42.log
+vtab__dinov3_vith16__paperhp__s42	done	sp-0010	1	1	2026-07-30T22:55:21	  FINAL: avg_acc=81.6%  avg_inc_acc=91.0%  bwt=-0.111  task0=77.1%
+cifar-100__dinov3_vitl16__paperhp__s1993	running	sp-0010	1	1	2026-07-30T22:55:22	/gpfs/data/oermannlab/users/steelr04/min_dinov3_paperhp/logs/cifar-100__dinov3_vitl16__paperhp__s1993.log
+vtab__dinov3_vith16__paperhp__s2024	done	sp-0014	1	1	2026-07-30T22:56:08	  FINAL: avg_acc=38.2%  avg_inc_acc=64.8%  bwt=-0.343  task0=59.5%
+cifar-100__dinov3_vitl16__paperhp__s2024	running	sp-0014	1	1	2026-07-30T22:56:08	/gpfs/data/oermannlab/users/steelr04/min_dinov3_paperhp/logs/cifar-100__dinov3_vitl16__paperhp__s2024.log
+vtab__dinov3_vith16__paperhp__s1993	done	sp-0014	4	1	2026-07-30T22:56:19	  FINAL: avg_acc=70.7%  avg_inc_acc=82.8%  bwt=-0.202  task0=75.7%
+cifar-100__dinov3_vitl16__paperhp__s31337	running	sp-0014	4	1	2026-07-30T22:56:19	/gpfs/data/oermannlab/users/steelr04/min_dinov3_paperhp/logs/cifar-100__dinov3_vitl16__paperhp__s31337.log
+vtab__dinov3_vith16__paperhp__s31337	done	sp-0014	0	1	2026-07-30T22:57:00	  FINAL: avg_acc=27.8%  avg_inc_acc=54.2%  bwt=-0.220  task0=50.1%
+cub-200__dinov3_vitl16__paperhp__s7	running	sp-0014	0	1	2026-07-30T22:57:00	/gpfs/data/oermannlab/users/steelr04/min_dinov3_paperhp/logs/cub-200__dinov3_vitl16__paperhp__s7.log
+imagenet-r__dinov3_vith16__paperhp__s42	done	sp-0014	6	1	2026-07-30T23:06:57	  FINAL: avg_acc=4.9%  avg_inc_acc=18.6%  bwt=-0.238  task0=36.7%
+cub-200__dinov3_vitl16__paperhp__s42	running	sp-0014	6	1	2026-07-30T23:06:57	/gpfs/data/oermannlab/users/steelr04/min_dinov3_paperhp/logs/cub-200__dinov3_vitl16__paperhp__s42.log
+imagenet-r__dinov3_vith16__paperhp__s7	done	sp-0014	5	1	2026-07-30T23:07:15	  FINAL: avg_acc=37.7%  avg_inc_acc=51.4%  bwt=-0.137  task0=58.3%
+cub-200__dinov3_vitl16__paperhp__s1993	running	sp-0014	5	1	2026-07-30T23:07:15	/gpfs/data/oermannlab/users/steelr04/min_dinov3_paperhp/logs/cub-200__dinov3_vitl16__paperhp__s1993.log
+imagenet-r__dinov3_vith16__paperhp__s1993	done	sp-0014	7	1	2026-07-30T23:19:19	  FINAL: avg_acc=5.1%  avg_inc_acc=18.1%  bwt=-0.358  task0=0.0%
+cub-200__dinov3_vitl16__paperhp__s2024	running	sp-0014	7	1	2026-07-30T23:19:20	/gpfs/data/oermannlab/users/steelr04/min_dinov3_paperhp/logs/cub-200__dinov3_vitl16__paperhp__s2024.log
+cub-200__dinov3_vitl16__paperhp__s7	done	sp-0014	0	1	2026-07-30T23:28:28	  FINAL: avg_acc=91.6%  avg_inc_acc=95.5%  bwt=-0.035  task0=88.6%
+cub-200__dinov3_vitl16__paperhp__s31337	running	sp-0014	0	1	2026-07-30T23:28:28	/gpfs/data/oermannlab/users/steelr04/min_dinov3_paperhp/logs/cub-200__dinov3_vitl16__paperhp__s31337.log
+cub-200__dinov3_vitl16__paperhp__s42	done	sp-0014	6	1	2026-07-30T23:39:51	  FINAL: avg_acc=91.7%  avg_inc_acc=94.1%  bwt=-0.035  task0=93.3%
+imagenet-a__dinov3_vitl16__paperhp__s7	running	sp-0014	6	1	2026-07-30T23:39:51	/gpfs/data/oermannlab/users/steelr04/min_dinov3_paperhp/logs/imagenet-a__dinov3_vitl16__paperhp__s7.log
+cub-200__dinov3_vitl16__paperhp__s1993	done	sp-0014	5	1	2026-07-30T23:39:55	  FINAL: avg_acc=91.6%  avg_inc_acc=95.1%  bwt=-0.036  task0=87.1%
+imagenet-a__dinov3_vitl16__paperhp__s42	running	sp-0014	5	1	2026-07-30T23:39:55	/gpfs/data/oermannlab/users/steelr04/min_dinov3_paperhp/logs/imagenet-a__dinov3_vitl16__paperhp__s42.log
+cub-200__dinov3_vitl16__paperhp__s2024	done	sp-0014	7	1	2026-07-30T23:52:04	  FINAL: avg_acc=92.0%  avg_inc_acc=95.9%  bwt=-0.036  task0=95.6%
+imagenet-a__dinov3_vitl16__paperhp__s1993	running	sp-0014	7	1	2026-07-30T23:52:05	/gpfs/data/oermannlab/users/steelr04/min_dinov3_paperhp/logs/imagenet-a__dinov3_vitl16__paperhp__s1993.log
+imagenet-a__dinov3_vitl16__paperhp__s42	done	sp-0014	5	1	2026-07-30T23:58:32	  FINAL: avg_acc=82.9%  avg_inc_acc=89.4%  bwt=-0.061  task0=91.4%
+imagenet-a__dinov3_vitl16__paperhp__s2024	running	sp-0014	5	1	2026-07-30T23:58:32	/gpfs/data/oermannlab/users/steelr04/min_dinov3_paperhp/logs/imagenet-a__dinov3_vitl16__paperhp__s2024.log
+imagenet-a__dinov3_vitl16__paperhp__s7	done	sp-0014	6	1	2026-07-30T23:58:37	  FINAL: avg_acc=83.8%  avg_inc_acc=89.6%  bwt=-0.066  task0=84.2%
+imagenet-a__dinov3_vitl16__paperhp__s31337	running	sp-0014	6	1	2026-07-30T23:58:38	/gpfs/data/oermannlab/users/steelr04/min_dinov3_paperhp/logs/imagenet-a__dinov3_vitl16__paperhp__s31337.log
+cub-200__dinov3_vitl16__paperhp__s31337	done	sp-0014	0	1	2026-07-31T00:01:09	  FINAL: avg_acc=92.0%  avg_inc_acc=94.5%  bwt=-0.030  task0=93.2%
+imagenet-r__dinov3_vitl16__paperhp__s7	running	sp-0014	0	1	2026-07-31T00:01:09	/gpfs/data/oermannlab/users/steelr04/min_dinov3_paperhp/logs/imagenet-r__dinov3_vitl16__paperhp__s7.log
+imagenet-a__dinov3_vitl16__paperhp__s1993	done	sp-0014	7	1	2026-07-31T00:10:46	  FINAL: avg_acc=84.0%  avg_inc_acc=89.8%  bwt=-0.067  task0=81.0%
+imagenet-r__dinov3_vitl16__paperhp__s42	running	sp-0014	7	1	2026-07-31T00:10:47	/gpfs/data/oermannlab/users/steelr04/min_dinov3_paperhp/logs/imagenet-r__dinov3_vitl16__paperhp__s42.log
+imagenet-a__dinov3_vitl16__paperhp__s31337	done	sp-0014	6	1	2026-07-31T00:17:12	  FINAL: avg_acc=83.0%  avg_inc_acc=88.5%  bwt=-0.072  task0=85.2%
+imagenet-r__dinov3_vitl16__paperhp__s1993	running	sp-0014	6	1	2026-07-31T00:17:12	/gpfs/data/oermannlab/users/steelr04/min_dinov3_paperhp/logs/imagenet-r__dinov3_vitl16__paperhp__s1993.log
+imagenet-a__dinov3_vitl16__paperhp__s2024	done	sp-0014	5	1	2026-07-31T00:17:15	  FINAL: avg_acc=79.9%  avg_inc_acc=87.9%  bwt=-0.069  task0=81.4%
+imagenet-r__dinov3_vitl16__paperhp__s2024	running	sp-0014	5	1	2026-07-31T00:17:15	/gpfs/data/oermannlab/users/steelr04/min_dinov3_paperhp/logs/imagenet-r__dinov3_vitl16__paperhp__s2024.log
+imagenet-r__dinov3_vith16__paperhp__s2024	done	sp-0010	4	1	2026-07-31T01:01:43	  FINAL: avg_acc=5.4%  avg_inc_acc=18.3%  bwt=-0.200  task0=17.0%
+imagenet-r__dinov3_vith16__paperhp__s31337	done	sp-0010	5	1	2026-07-31T01:01:43	  FINAL: avg_acc=53.1%  avg_inc_acc=64.9%  bwt=-0.102  task0=77.7%
+cifar-100__dinov3_vitl16__paperhp__s42	done	sp-0014	2	1	2026-07-31T01:01:43	  FINAL: avg_acc=83.6%  avg_inc_acc=89.2%  bwt=-0.071  task0=96.6%
+cifar-100__dinov3_vitl16__paperhp__s7	done	sp-0014	3	1	2026-07-31T01:01:43	  FINAL: avg_acc=83.8%  avg_inc_acc=89.3%  bwt=-0.056  task0=91.2%
+imagenet-r__dinov3_vitl16__paperhp__s31337	running	sp-0014	3	1	2026-07-31T01:01:44	/gpfs/data/oermannlab/users/steelr04/min_dinov3_paperhp/logs/imagenet-r__dinov3_vitl16__paperhp__s31337.log
+omnibenchmark__dinov3_vitl16__paperhp__s7	running	sp-0014	2	1	2026-07-31T01:01:44	/gpfs/data/oermannlab/users/steelr04/min_dinov3_paperhp/logs/omnibenchmark__dinov3_vitl16__paperhp__s7.log
+omnibenchmark__dinov3_vitl16__paperhp__s42	running	sp-0010	5	1	2026-07-31T01:01:44	/gpfs/data/oermannlab/users/steelr04/min_dinov3_paperhp/logs/omnibenchmark__dinov3_vitl16__paperhp__s42.log
+omnibenchmark__dinov3_vitl16__paperhp__s1993	running	sp-0010	4	1	2026-07-31T01:01:44	/gpfs/data/oermannlab/users/steelr04/min_dinov3_paperhp/logs/omnibenchmark__dinov3_vitl16__paperhp__s1993.log
+imagenet-r__dinov3_vitl16__paperhp__s31337	retry	sp-0014	3	1	2026-07-31T01:01:46	exit=1
+imagenet-r__dinov3_vitl16__paperhp__s31337	running	sp-0014	3	2	2026-07-31T01:02:17	/gpfs/data/oermannlab/users/steelr04/min_dinov3_paperhp/logs/imagenet-r__dinov3_vitl16__paperhp__s31337.log
+cifar-100__dinov3_vitl16__paperhp__s1993	done	sp-0010	1	1	2026-07-31T01:11:12	  FINAL: avg_acc=81.5%  avg_inc_acc=88.4%  bwt=-0.075  task0=93.6%
+omnibenchmark__dinov3_vitl16__paperhp__s2024	running	sp-0010	1	1	2026-07-31T01:11:12	/gpfs/data/oermannlab/users/steelr04/min_dinov3_paperhp/logs/omnibenchmark__dinov3_vitl16__paperhp__s2024.log
+cifar-100__dinov3_vitl16__paperhp__s31337	done	sp-0014	4	1	2026-07-31T01:11:53	  FINAL: avg_acc=86.3%  avg_inc_acc=91.8%  bwt=-0.047  task0=96.4%
+omnibenchmark__dinov3_vitl16__paperhp__s31337	running	sp-0014	4	1	2026-07-31T01:11:54	/gpfs/data/oermannlab/users/steelr04/min_dinov3_paperhp/logs/omnibenchmark__dinov3_vitl16__paperhp__s31337.log
+cifar-100__dinov3_vitl16__paperhp__s2024	done	sp-0014	1	1	2026-07-31T01:11:56	  FINAL: avg_acc=86.2%  avg_inc_acc=92.1%  bwt=-0.049  task0=90.6%
+vtab__dinov3_vitl16__paperhp__s7	running	sp-0014	1	1	2026-07-31T01:11:56	/gpfs/data/oermannlab/users/steelr04/min_dinov3_paperhp/logs/vtab__dinov3_vitl16__paperhp__s7.log
+imagenet-r__dinov3_vitl16__paperhp__s7	done	sp-0014	0	1	2026-07-31T01:19:02	  FINAL: avg_acc=91.2%  avg_inc_acc=94.1%  bwt=-0.027  task0=96.2%
+vtab__dinov3_vitl16__paperhp__s42	running	sp-0014	0	1	2026-07-31T01:19:02	/gpfs/data/oermannlab/users/steelr04/min_dinov3_paperhp/logs/vtab__dinov3_vitl16__paperhp__s42.log
+vtab__dinov3_vitl16__paperhp__s7	done	sp-0014	1	1	2026-07-31T01:22:14	  FINAL: avg_acc=95.6%  avg_inc_acc=97.3%  bwt=-0.029  task0=93.3%
+vtab__dinov3_vitl16__paperhp__s1993	running	sp-0014	1	1	2026-07-31T01:22:14	/gpfs/data/oermannlab/users/steelr04/min_dinov3_paperhp/logs/vtab__dinov3_vitl16__paperhp__s1993.log
+vtab__dinov3_vitl16__paperhp__s42	done	sp-0014	0	1	2026-07-31T01:27:43	  FINAL: avg_acc=95.0%  avg_inc_acc=97.9%  bwt=-0.031  task0=95.3%
+vtab__dinov3_vitl16__paperhp__s2024	running	sp-0014	0	1	2026-07-31T01:27:43	/gpfs/data/oermannlab/users/steelr04/min_dinov3_paperhp/logs/vtab__dinov3_vitl16__paperhp__s2024.log
+imagenet-r__dinov3_vitl16__paperhp__s42	done	sp-0014	7	1	2026-07-31T01:27:57	  FINAL: avg_acc=90.5%  avg_inc_acc=93.8%  bwt=-0.030  task0=97.0%
+vtab__dinov3_vitl16__paperhp__s31337	running	sp-0014	7	1	2026-07-31T01:27:57	/gpfs/data/oermannlab/users/steelr04/min_dinov3_paperhp/logs/vtab__dinov3_vitl16__paperhp__s31337.log
+vtab__dinov3_vitl16__paperhp__s1993	done	sp-0014	1	1	2026-07-31T01:31:06	  FINAL: avg_acc=94.9%  avg_inc_acc=96.9%  bwt=-0.026  task0=96.7%
+cifar-100__dinov3_vitb16__paperhp__s7	running	sp-0014	1	1	2026-07-31T01:31:06	/gpfs/data/oermannlab/users/steelr04/min_dinov3_paperhp/logs/cifar-100__dinov3_vitb16__paperhp__s7.log
+imagenet-r__dinov3_vitl16__paperhp__s1993	done	sp-0014	6	1	2026-07-31T01:34:13	  FINAL: avg_acc=92.5%  avg_inc_acc=95.2%  bwt=-0.028  task0=95.5%
+cifar-100__dinov3_vitb16__paperhp__s42	running	sp-0014	6	1	2026-07-31T01:34:13	/gpfs/data/oermannlab/users/steelr04/min_dinov3_paperhp/logs/cifar-100__dinov3_vitb16__paperhp__s42.log
+imagenet-r__dinov3_vitl16__paperhp__s2024	done	sp-0014	5	1	2026-07-31T01:34:23	  FINAL: avg_acc=90.0%  avg_inc_acc=93.7%  bwt=-0.037  task0=91.3%
+cifar-100__dinov3_vitb16__paperhp__s1993	running	sp-0014	5	1	2026-07-31T01:34:23	/gpfs/data/oermannlab/users/steelr04/min_dinov3_paperhp/logs/cifar-100__dinov3_vitb16__paperhp__s1993.log
+vtab__dinov3_vitl16__paperhp__s2024	done	sp-0014	0	1	2026-07-31T01:36:37	  FINAL: avg_acc=92.7%  avg_inc_acc=96.4%  bwt=-0.045  task0=94.6%
+cifar-100__dinov3_vitb16__paperhp__s2024	running	sp-0014	0	1	2026-07-31T01:36:37	/gpfs/data/oermannlab/users/steelr04/min_dinov3_paperhp/logs/cifar-100__dinov3_vitb16__paperhp__s2024.log
+vtab__dinov3_vitl16__paperhp__s31337	done	sp-0014	7	1	2026-07-31T01:36:56	  FINAL: avg_acc=94.6%  avg_inc_acc=97.0%  bwt=-0.031  task0=95.5%
+cifar-100__dinov3_vitb16__paperhp__s31337	running	sp-0014	7	1	2026-07-31T01:36:56	/gpfs/data/oermannlab/users/steelr04/min_dinov3_paperhp/logs/cifar-100__dinov3_vitb16__paperhp__s31337.log
+imagenet-r__dinov3_vitl16__paperhp__s31337	done	sp-0014	3	2	2026-07-31T02:19:01	  FINAL: avg_acc=92.1%  avg_inc_acc=94.9%  bwt=-0.028  task0=97.3%
+cub-200__dinov3_vitb16__paperhp__s7	running	sp-0014	3	1	2026-07-31T02:19:01	/gpfs/data/oermannlab/users/steelr04/min_dinov3_paperhp/logs/cub-200__dinov3_vitb16__paperhp__s7.log
+cifar-100__dinov3_vitb16__paperhp__s7	done	sp-0014	1	1	2026-07-31T02:20:59	  FINAL: avg_acc=86.4%  avg_inc_acc=91.6%  bwt=-0.052  task0=90.6%
+cub-200__dinov3_vitb16__paperhp__s42	running	sp-0014	1	1	2026-07-31T02:20:59	/gpfs/data/oermannlab/users/steelr04/min_dinov3_paperhp/logs/cub-200__dinov3_vitb16__paperhp__s42.log
+cifar-100__dinov3_vitb16__paperhp__s42	done	sp-0014	6	1	2026-07-31T02:24:17	  FINAL: avg_acc=89.0%  avg_inc_acc=93.3%  bwt=-0.052  task0=95.2%
+cub-200__dinov3_vitb16__paperhp__s1993	running	sp-0014	6	1	2026-07-31T02:24:17	/gpfs/data/oermannlab/users/steelr04/min_dinov3_paperhp/logs/cub-200__dinov3_vitb16__paperhp__s1993.log
+cifar-100__dinov3_vitb16__paperhp__s1993	done	sp-0014	5	1	2026-07-31T02:24:49	  FINAL: avg_acc=85.1%  avg_inc_acc=91.0%  bwt=-0.063  task0=92.6%
+cub-200__dinov3_vitb16__paperhp__s2024	running	sp-0014	5	1	2026-07-31T02:24:49	/gpfs/data/oermannlab/users/steelr04/min_dinov3_paperhp/logs/cub-200__dinov3_vitb16__paperhp__s2024.log
+cifar-100__dinov3_vitb16__paperhp__s2024	done	sp-0014	0	1	2026-07-31T02:25:17	  FINAL: avg_acc=89.1%  avg_inc_acc=94.0%  bwt=-0.042  task0=89.6%
+cub-200__dinov3_vitb16__paperhp__s31337	running	sp-0014	0	1	2026-07-31T02:25:18	/gpfs/data/oermannlab/users/steelr04/min_dinov3_paperhp/logs/cub-200__dinov3_vitb16__paperhp__s31337.log
+cifar-100__dinov3_vitb16__paperhp__s31337	done	sp-0014	7	1	2026-07-31T02:25:42	  FINAL: avg_acc=89.5%  avg_inc_acc=93.7%  bwt=-0.041  task0=93.6%
+imagenet-a__dinov3_vitb16__paperhp__s7	running	sp-0014	7	1	2026-07-31T02:25:42	/gpfs/data/oermannlab/users/steelr04/min_dinov3_paperhp/logs/imagenet-a__dinov3_vitb16__paperhp__s7.log
+imagenet-a__dinov3_vitb16__paperhp__s7	done	sp-0014	7	1	2026-07-31T02:34:42	  FINAL: avg_acc=73.0%  avg_inc_acc=82.0%  bwt=-0.110  task0=68.3%
+imagenet-a__dinov3_vitb16__paperhp__s42	running	sp-0014	7	1	2026-07-31T02:34:43	/gpfs/data/oermannlab/users/steelr04/min_dinov3_paperhp/logs/imagenet-a__dinov3_vitb16__paperhp__s42.log
+cub-200__dinov3_vitb16__paperhp__s7	done	sp-0014	3	1	2026-07-31T02:37:23	  FINAL: avg_acc=90.6%  avg_inc_acc=94.7%  bwt=-0.041  task0=89.5%
+imagenet-a__dinov3_vitb16__paperhp__s1993	running	sp-0014	3	1	2026-07-31T02:37:23	/gpfs/data/oermannlab/users/steelr04/min_dinov3_paperhp/logs/imagenet-a__dinov3_vitb16__paperhp__s1993.log
+cub-200__dinov3_vitb16__paperhp__s42	done	sp-0014	1	1	2026-07-31T02:38:29	  FINAL: avg_acc=90.9%  avg_inc_acc=93.6%  bwt=-0.040  task0=93.3%
+imagenet-a__dinov3_vitb16__paperhp__s2024	running	sp-0014	1	1	2026-07-31T02:38:30	/gpfs/data/oermannlab/users/steelr04/min_dinov3_paperhp/logs/imagenet-a__dinov3_vitb16__paperhp__s2024.log
+cub-200__dinov3_vitb16__paperhp__s1993	done	sp-0014	6	1	2026-07-31T02:42:25	  FINAL: avg_acc=91.0%  avg_inc_acc=94.8%  bwt=-0.038  task0=87.1%
+imagenet-a__dinov3_vitb16__paperhp__s31337	running	sp-0014	6	1	2026-07-31T02:42:26	/gpfs/data/oermannlab/users/steelr04/min_dinov3_paperhp/logs/imagenet-a__dinov3_vitb16__paperhp__s31337.log
+cub-200__dinov3_vitb16__paperhp__s2024	done	sp-0014	5	1	2026-07-31T02:42:26	  FINAL: avg_acc=90.5%  avg_inc_acc=94.7%  bwt=-0.047  task0=94.1%
+imagenet-r__dinov3_vitb16__paperhp__s7	running	sp-0014	5	1	2026-07-31T02:42:26	/gpfs/data/oermannlab/users/steelr04/min_dinov3_paperhp/logs/imagenet-r__dinov3_vitb16__paperhp__s7.log
+cub-200__dinov3_vitb16__paperhp__s31337	done	sp-0014	0	1	2026-07-31T02:42:26	  FINAL: avg_acc=91.0%  avg_inc_acc=93.6%  bwt=-0.037  task0=88.1%
+imagenet-r__dinov3_vitb16__paperhp__s42	running	sp-0014	0	1	2026-07-31T02:42:26	/gpfs/data/oermannlab/users/steelr04/min_dinov3_paperhp/logs/imagenet-r__dinov3_vitb16__paperhp__s42.log
+imagenet-a__dinov3_vitb16__paperhp__s42	done	sp-0014	7	1	2026-07-31T02:44:50	  FINAL: avg_acc=73.0%  avg_inc_acc=82.5%  bwt=-0.105  task0=80.8%
+imagenet-r__dinov3_vitb16__paperhp__s1993	running	sp-0014	7	1	2026-07-31T02:44:50	/gpfs/data/oermannlab/users/steelr04/min_dinov3_paperhp/logs/imagenet-r__dinov3_vitb16__paperhp__s1993.log
+imagenet-a__dinov3_vitb16__paperhp__s2024	done	sp-0014	1	1	2026-07-31T02:47:32	  FINAL: avg_acc=72.2%  avg_inc_acc=81.8%  bwt=-0.094  task0=72.1%
+imagenet-a__dinov3_vitb16__paperhp__s1993	done	sp-0014	3	1	2026-07-31T02:47:32	  FINAL: avg_acc=72.1%  avg_inc_acc=81.4%  bwt=-0.106  task0=73.3%
+imagenet-r__dinov3_vitb16__paperhp__s2024	running	sp-0014	1	1	2026-07-31T02:47:32	/gpfs/data/oermannlab/users/steelr04/min_dinov3_paperhp/logs/imagenet-r__dinov3_vitb16__paperhp__s2024.log
+imagenet-r__dinov3_vitb16__paperhp__s31337	running	sp-0014	3	1	2026-07-31T02:47:32	/gpfs/data/oermannlab/users/steelr04/min_dinov3_paperhp/logs/imagenet-r__dinov3_vitb16__paperhp__s31337.log
+imagenet-a__dinov3_vitb16__paperhp__s31337	done	sp-0014	6	1	2026-07-31T02:52:37	  FINAL: avg_acc=73.1%  avg_inc_acc=81.9%  bwt=-0.109  task0=73.3%
+omnibenchmark__dinov3_vitb16__paperhp__s7	running	sp-0014	6	1	2026-07-31T02:52:37	/gpfs/data/oermannlab/users/steelr04/min_dinov3_paperhp/logs/omnibenchmark__dinov3_vitb16__paperhp__s7.log
+imagenet-r__dinov3_vitb16__paperhp__s7	done	sp-0014	5	1	2026-07-31T03:18:44	  FINAL: avg_acc=89.3%  avg_inc_acc=92.9%  bwt=-0.042  task0=88.2%
+imagenet-r__dinov3_vitb16__paperhp__s42	done	sp-0014	0	1	2026-07-31T03:18:44	  FINAL: avg_acc=89.0%  avg_inc_acc=93.0%  bwt=-0.042  task0=92.6%
+omnibenchmark__dinov3_vitb16__paperhp__s42	running	sp-0014	5	1	2026-07-31T03:18:45	/gpfs/data/oermannlab/users/steelr04/min_dinov3_paperhp/logs/omnibenchmark__dinov3_vitb16__paperhp__s42.log
+omnibenchmark__dinov3_vitb16__paperhp__s1993	running	sp-0014	0	1	2026-07-31T03:18:45	/gpfs/data/oermannlab/users/steelr04/min_dinov3_paperhp/logs/omnibenchmark__dinov3_vitb16__paperhp__s1993.log
+imagenet-r__dinov3_vitb16__paperhp__s1993	done	sp-0014	7	1	2026-07-31T03:20:36	  FINAL: avg_acc=89.8%  avg_inc_acc=94.1%  bwt=-0.048  task0=88.7%
+omnibenchmark__dinov3_vitb16__paperhp__s2024	running	sp-0014	7	1	2026-07-31T03:20:36	/gpfs/data/oermannlab/users/steelr04/min_dinov3_paperhp/logs/omnibenchmark__dinov3_vitb16__paperhp__s2024.log
+imagenet-r__dinov3_vitb16__paperhp__s2024	done	sp-0014	1	1	2026-07-31T03:23:46	  FINAL: avg_acc=89.7%  avg_inc_acc=93.9%  bwt=-0.041  task0=91.0%
+omnibenchmark__dinov3_vitb16__paperhp__s31337	running	sp-0014	1	1	2026-07-31T03:23:47	/gpfs/data/oermannlab/users/steelr04/min_dinov3_paperhp/logs/omnibenchmark__dinov3_vitb16__paperhp__s31337.log
+imagenet-r__dinov3_vitb16__paperhp__s31337	done	sp-0014	3	1	2026-07-31T03:23:50	  FINAL: avg_acc=89.6%  avg_inc_acc=93.6%  bwt=-0.038  task0=92.0%
+vtab__dinov3_vitb16__paperhp__s7	running	sp-0014	3	1	2026-07-31T03:23:50	/gpfs/data/oermannlab/users/steelr04/min_dinov3_paperhp/logs/vtab__dinov3_vitb16__paperhp__s7.log
+vtab__dinov3_vitb16__paperhp__s7	done	sp-0014	3	1	2026-07-31T03:29:52	  FINAL: avg_acc=95.2%  avg_inc_acc=97.2%  bwt=-0.038  task0=91.1%
+vtab__dinov3_vitb16__paperhp__s42	running	sp-0014	3	1	2026-07-31T03:29:52	/gpfs/data/oermannlab/users/steelr04/min_dinov3_paperhp/logs/vtab__dinov3_vitb16__paperhp__s42.log
+vtab__dinov3_vitb16__paperhp__s42	done	sp-0014	3	1	2026-07-31T03:35:41	  FINAL: avg_acc=95.1%  avg_inc_acc=97.7%  bwt=-0.030  task0=93.9%
+vtab__dinov3_vitb16__paperhp__s1993	running	sp-0014	3	1	2026-07-31T03:35:42	/gpfs/data/oermannlab/users/steelr04/min_dinov3_paperhp/logs/vtab__dinov3_vitb16__paperhp__s1993.log
+vtab__dinov3_vitb16__paperhp__s1993	done	sp-0014	3	1	2026-07-31T03:41:39	  FINAL: avg_acc=95.1%  avg_inc_acc=97.3%  bwt=-0.026  task0=95.9%
+vtab__dinov3_vitb16__paperhp__s2024	running	sp-0014	3	1	2026-07-31T03:41:40	/gpfs/data/oermannlab/users/steelr04/min_dinov3_paperhp/logs/vtab__dinov3_vitb16__paperhp__s2024.log
+vtab__dinov3_vitb16__paperhp__s2024	done	sp-0014	3	1	2026-07-31T03:47:33	  FINAL: avg_acc=93.5%  avg_inc_acc=96.7%  bwt=-0.041  task0=94.0%
+vtab__dinov3_vitb16__paperhp__s31337	running	sp-0014	3	1	2026-07-31T03:47:34	/gpfs/data/oermannlab/users/steelr04/min_dinov3_paperhp/logs/vtab__dinov3_vitb16__paperhp__s31337.log
+vtab__dinov3_vitb16__paperhp__s31337	done	sp-0014	3	1	2026-07-31T03:53:36	  FINAL: avg_acc=95.2%  avg_inc_acc=97.1%  bwt=-0.028  task0=94.3%
+omnibenchmark__dinov3_vitb16__paperhp__s7	done	sp-0014	6	1	2026-07-31T04:14:57	  FINAL: avg_acc=81.2%  avg_inc_acc=89.1%  bwt=-0.095  task0=89.8%
+omnibenchmark__dinov3_vitb16__paperhp__s42	done	sp-0014	5	1	2026-07-31T04:39:50	  FINAL: avg_acc=80.6%  avg_inc_acc=88.7%  bwt=-0.094  task0=81.0%
+omnibenchmark__dinov3_vitb16__paperhp__s1993	done	sp-0014	0	1	2026-07-31T04:40:04	  FINAL: avg_acc=80.7%  avg_inc_acc=88.9%  bwt=-0.102  task0=73.5%
+omnibenchmark__dinov3_vitb16__paperhp__s2024	done	sp-0014	7	1	2026-07-31T04:40:35	  FINAL: avg_acc=82.3%  avg_inc_acc=89.1%  bwt=-0.090  task0=81.3%
+omnibenchmark__dinov3_vitb16__paperhp__s31337	done	sp-0014	1	1	2026-07-31T04:46:21	  FINAL: avg_acc=81.5%  avg_inc_acc=90.1%  bwt=-0.092  task0=77.7%
+omnibenchmark__dinov3_vitl16__paperhp__s42	done	sp-0010	5	1	2026-07-31T04:55:05	  FINAL: avg_acc=77.9%  avg_inc_acc=86.1%  bwt=-0.110  task0=78.2%
+omnibenchmark__dinov3_vitl16__paperhp__s1993	done	sp-0010	4	1	2026-07-31T04:55:33	  FINAL: avg_acc=79.9%  avg_inc_acc=88.5%  bwt=-0.107  task0=71.6%
+omnibenchmark__dinov3_vitl16__paperhp__s7	done	sp-0014	2	1	2026-07-31T04:58:55	  FINAL: avg_acc=79.4%  avg_inc_acc=88.1%  bwt=-0.124  task0=87.1%
+omnibenchmark__dinov3_vitl16__paperhp__s2024	done	sp-0010	1	1	2026-07-31T05:05:25	  FINAL: avg_acc=81.0%  avg_inc_acc=87.7%  bwt=-0.114  task0=75.6%
+omnibenchmark__dinov3_vitl16__paperhp__s31337	done	sp-0014	4	1	2026-07-31T05:08:39	  FINAL: avg_acc=79.1%  avg_inc_acc=88.7%  bwt=-0.125  task0=72.0%
+omnibenchmark__dinov3_vith16__paperhp__s7	done	sp-0010	0	1	2026-07-31T07:17:16	  FINAL: avg_acc=18.4%  avg_inc_acc=37.9%  bwt=-0.463  task0=8.2%
+omnibenchmark__dinov3_vith16__paperhp__s42	done	sp-0010	6	1	2026-07-31T07:18:20	  FINAL: avg_acc=10.4%  avg_inc_acc=29.4%  bwt=-0.976  task0=0.0%
+omnibenchmark__dinov3_vith16__paperhp__s2024	done	sp-0010	7	1	2026-07-31T07:18:27	  FINAL: avg_acc=23.0%  avg_inc_acc=42.9%  bwt=-0.284  task0=22.7%
+omnibenchmark__dinov3_vith16__paperhp__s31337	done	sp-0010	2	1	2026-07-31T07:20:05	  FINAL: avg_acc=16.7%  avg_inc_acc=36.7%  bwt=-0.354  task0=17.2%
+omnibenchmark__dinov3_vith16__paperhp__s1993	done	sp-0010	3	1	2026-07-31T07:21:04	  FINAL: avg_acc=18.0%  avg_inc_acc=37.8%  bwt=-0.401  task0=6.9%

@@ -231,3 +231,11 @@ collapsed seeds (1993: 90.3%→6.5 at ep14; 7: 91.3%→31→3.7 at ep11) never
 recover, the two dippers that recovered (2024, 42) survive. Blow-ups strike
 at ANY epoch, late included — so init_epochs (omni stock = 20) also modulates
 exposure. Confirms Mode A generalizes beyond cifar; survival == recovery.
+
+## 2026-07-31 — second node joined the paperhp sweep
+
+Robert/manager launched `min_d3php_sp10` (25991134, sp-0010, 2d limit) running
+workers against the shared min_dinov3_paperhp queue — the atomic-mkdir claims
+machinery absorbed it natively (no duplicate claims). 10/90 done, 0 failures,
+16 GPUs active. ETA ~15-20h. (sp-0010 was allocated by Robert's side, not by
+this worker — my jobs remain sp-0014-only per the resource rules.)

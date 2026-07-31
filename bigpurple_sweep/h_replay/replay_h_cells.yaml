@@ -1,0 +1,29 @@
+# Exact-replay of the 4 disputed DINOv3-H winners in the qz harness (qz seed 1993).
+# Each expanded config dict must hash (make_run_id) to the recorded run_id:
+#   imagenet-a    -> 126c1991af0e  (recorded avg_acc 0.6432)
+#   imagenet-r    -> f912d4b7b518  (recorded avg_acc 0.5371)
+#   omnibenchmark -> 3677ab51f933  (recorded avg_acc 0.5388)
+#   vtab          -> 8a0c2392da30  (recorded avg_acc 0.9527)
+# Verify with --dry-run BEFORE running: printed run_ids must match the above.
+sweep:
+  name: h_replay_1993
+  classifier: min
+  backbone: dinov3_vith16
+  seed: 1993
+  min_batch_size: 64
+  min_init_batch_size: 64
+  min_buffer_batch: 256
+  min_hidden_dim: 192
+  runs:
+    - benchmark: imagenet-a
+      min_gamma: 50
+      min_lr: 0.00001
+    - benchmark: imagenet-r
+      min_gamma: 75
+      min_lr: 0.00005
+    - benchmark: omnibenchmark
+      min_gamma: 50
+      min_lr: 0.00005
+    - benchmark: vtab
+      min_gamma: 25
+      min_lr: 0.00005

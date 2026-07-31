@@ -320,3 +320,25 @@ Goal-1 aggregation + CPU-free analysis only. The Goal-1 report must include a
    (-3.4) are where noise-lr-lowered variants beat the original space so far.
    For H, the open question is whether cifar-H-style init settings rescue the
    other 5 cells (P4's direct test — paused with the diag).
+
+## 2026-07-31 — H-cell exact-replay (Robert-ordered coda), interim
+
+Byte-fidelity established: replay YAML expands through qz's loader to dicts
+EQUAL to the recorded configs; harness echoes all 4 recorded run_ids at load.
+qz min path unchanged since winner commit 8c541bc; stem/vith16 config
+fallback immaterial; same container, WDS shards, seed, GPU type. gpu_ids is
+set but never consumed (no DataParallel) — multi-GPU visibility in May could
+not have changed the math. Zero argument deviations.
+
+- **vtab-H: 95.00 vs recorded 95.27 (−0.27pp) → recorded value CONFIRMED
+  real.** A genuine lucky draw of a config that is seed-unstable (5-seed:
+  51.6±23.2, 3/5 collapse).
+- **ina-H: replays 10.50, 25.96, 13.56 vs recorded 64.32 — 3/3 fail, none
+  close.** All three show depressed/blown-up task-0 training (final train acc
+  11-47%; the first replay converged to ~62% then blew up at epoch 10/10 —
+  the Mode-A fingerprint). At fixed (config, seed), the outcome is decided by
+  CUDA nondeterminism at the task-0 knife edge; the recorded ≥64 outcome is
+  at best a rare draw (0/3), at worst provenance-compromised. Fixed-seed
+  spread (10.5-26.0) is comparable to cross-seed spread (16.2-51.0): class
+  order is NOT the dominant randomness for this cell.
+- inr-H (40-task qz protocol), omni-H: still running.

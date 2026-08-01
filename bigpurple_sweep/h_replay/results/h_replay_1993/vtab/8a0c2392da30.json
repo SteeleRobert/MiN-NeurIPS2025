@@ -1,0 +1,76 @@
+{
+  "label": "[1/1] MiN + dinov3_vith16",
+  "metrics": {
+    "avg_acc": 0.95,
+    "avg_inc_acc": 0.9780300000000001,
+    "bwt": -0.03527499999999997,
+    "task0_final": 0.9734,
+    "final_min_task_acc": 0.9032,
+    "final_max_task_acc": 0.9734
+  },
+  "task_accs_history": {
+    "0": {
+      "0": 1.0
+    },
+    "1": {
+      "0": 0.9952,
+      "1": 0.998
+    },
+    "2": {
+      "0": 0.9806,
+      "1": 0.9797,
+      "2": 0.9743
+    },
+    "3": {
+      "0": 0.9734,
+      "1": 0.9782,
+      "2": 0.9498,
+      "3": 0.96
+    },
+    "4": {
+      "0": 0.9734,
+      "1": 0.9594,
+      "2": 0.9032,
+      "3": 0.9552,
+      "4": 0.9588
+    }
+  },
+  "classifier_stats": {
+    "backbone_type": "dinov3_vith16",
+    "total_acc": [
+      99.76,
+      99.02,
+      97.12,
+      96.04,
+      93.84
+    ],
+    "known_classes": 50,
+    "cur_task": 4
+  },
+  "timings": [
+    70.41152024269104,
+    173.69867634773254,
+    172.77010798454285,
+    168.99759888648987,
+    280.9002504348755
+  ],
+  "seed": 1993,
+  "skip_tasks": [],
+  "backbone": "dinov3_vith16",
+  "classifier": "min",
+  "benchmark": "vtab",
+  "run_id": "8a0c2392da30",
+  "sweep": "h_replay_1993",
+  "config": {
+    "classifier": "min",
+    "backbone": "dinov3_vith16",
+    "seed": 1993,
+    "min_batch_size": 64,
+    "min_init_batch_size": 64,
+    "min_buffer_batch": 256,
+    "min_hidden_dim": 192,
+    "benchmark": "vtab",
+    "min_gamma": 25,
+    "min_lr": 5e-05
+  }
+}

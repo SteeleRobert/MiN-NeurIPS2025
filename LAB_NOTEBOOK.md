@@ -342,3 +342,35 @@ not have changed the math. Zero argument deviations.
   spread (10.5-26.0) is comparable to cross-seed spread (16.2-51.0): class
   order is NOT the dominant randomness for this cell.
 - inr-H (40-task qz protocol), omni-H: still running.
+
+## 2026-08-01 — H-cell exact-replay COMPLETE. Verdict: run-level lottery.
+
+All 4 originals + 4 repeats done before holder 25999938 hit its natural 30h
+TIMEOUT (queue now empty; zero footprint). Raw JSONs in
+bigpurple_sweep/h_replay/results/.
+
+| cell | recorded | fixed-seed replays | verdict |
+|---|--:|---|---|
+| vtab-H | 95.27 | 95.00 | **CONFIRMED real** (−0.27pp) |
+| ina-H | 64.32 | 10.50, 25.96, 13.56 | NOT REPLAYABLE — 3/3 fail, none close |
+| inr-H | 53.71 | **63.31, 2.50, 3.54** | NOT REPLAYABLE — fixed-seed range spans 2.5→63.3; recorded value sits inside it |
+| omni-H | 53.88 | 21.97 (n=1; holder timeout precluded repeats) | MATERIALLY OFF, same pattern |
+
+**Read.** For ina/inr/omni-H the run-level outcome at byte-identical
+(config, seed, harness, data, container, GPU model) is decided by CUDA
+nondeterminism at the task-0/incremental knife edge — the fixed-seed spread
+(inr: 2.5–63.3) is as large as the cross-seed spread. The recorded values are
+best explained as favorable draws from this lottery, NOT as provenance
+errors: inr's recorded 53.7 is inside our observed fixed-seed range, and the
+mechanism (Mode-A blow-up; observed at epoch 10/10 in the first ina replay)
+predicts exactly this sensitivity. vtab-H's number is a real, replayable run
+— but of a config that is still a 5-seed lottery (51.6±23.2).
+The H-row story is therefore STRONGER than "lucky seeds": for 3 of the 4
+disputed cells, the published numbers are not reproducible even at fixed
+seed; "the experiment" as recorded does not define its own outcome.
+
+**Deviations from original args: NONE** (dict-equality + run_id hash + the
+harness echoing recorded run_ids at load). Environmental deltas, both
+immaterial: CUDA_VISIBLE_DEVICES pinning (single visible GPU vs 8 in May —
+gpu_ids is computed but never consumed; no DataParallel) and
+OMP_NUM_THREADS 16 vs 32 (CPU-side only).

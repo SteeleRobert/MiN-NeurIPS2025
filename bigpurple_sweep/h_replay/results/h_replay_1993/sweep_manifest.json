@@ -1,0 +1,28 @@
+{
+  "sweep_name": "h_replay_1993",
+  "total_runs": 1,
+  "feature_cache": false,
+  "started_at": "2026-07-31 14:59:46",
+  "runs": [
+    {
+      "run_id": "3677ab51f933",
+      "config": {
+        "classifier": "min",
+        "backbone": "dinov3_vith16",
+        "seed": 1993,
+        "min_batch_size": 64,
+        "min_init_batch_size": 64,
+        "min_buffer_batch": 256,
+        "min_hidden_dim": 192,
+        "benchmark": "omnibenchmark",
+        "min_gamma": 50,
+        "min_lr": 5e-05
+      },
+      "result_path": "omnibenchmark/3677ab51f933.json",
+      "avg_acc": 0.2197,
+      "avg_inc_acc": 0.4189236547619048,
+      "bwt": -0.31209999999999993
+    }
+  ],
+  "completed_at": "2026-07-31 23:59:31"
+}

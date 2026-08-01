@@ -1,0 +1,28 @@
+{
+  "sweep_name": "h_replay_1993",
+  "total_runs": 1,
+  "feature_cache": false,
+  "started_at": "2026-07-31 18:13:25",
+  "runs": [
+    {
+      "run_id": "f912d4b7b518",
+      "config": {
+        "classifier": "min",
+        "backbone": "dinov3_vith16",
+        "seed": 1993,
+        "min_batch_size": 64,
+        "min_init_batch_size": 64,
+        "min_buffer_batch": 256,
+        "min_hidden_dim": 192,
+        "benchmark": "imagenet-r",
+        "min_gamma": 75,
+        "min_lr": 5e-05
+      },
+      "result_path": "imagenet_r/f912d4b7b518.json",
+      "avg_acc": 0.03537,
+      "avg_inc_acc": 0.11834507386274284,
+      "bwt": -0.12213076923076922
+    }
+  ],
+  "completed_at": "2026-07-31 21:12:01"
+}

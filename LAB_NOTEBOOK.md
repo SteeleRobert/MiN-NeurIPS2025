@@ -374,3 +374,23 @@ harness echoing recorded run_ids at load). Environmental deltas, both
 immaterial: CUDA_VISIBLE_DEVICES pinning (single visible GPU vs 8 in May —
 gpu_ids is computed but never consumed; no DataParallel) and
 OMP_NUM_THREADS 16 vs 32 (CPU-side only).
+
+## 2026-08-04 — Goal-3-H launch, canary saga, and a resource conflict
+
+Holder 26076409 started ~10:30. Canary-first design paid for itself: SIX
+probe-driver bugs surfaced and fixed across canary iterations (device
+placement x2; the architectural fact that PiNoise.forward is undefined before
+the first update_noise() — no pre-train forward is possible; LRScheduler
+requires opt.step to be a bound method; numpy keys in JSONL and in the final
+print). All crash-type, none touching the method's computation. Canary v6
+(omni-H, init_lr=1e-4, seed 1993) then ran clean:
+
+  stage accs 100 -> 93 -> 74   (published config, same cell+seed: 100 -> 57 -> 39,
+                                after task-0 training failure at 16.6% train acc)
+
+Task-0 cooling eliminated the blow-up on the hardest cell — mechanism
+prediction 1-for-1. Full screen released (24 probes, 8 workers)… and at
+18:16 holder 26076409 was CANCELLED (steelr04 uid; job ola133_node, 6-day
+limit, took the node — OLA-133 reprioritization). 8 probes killed mid-run;
+1/24 done; queue+claims fully resumable. Escalated to manager with a
+concrete ask (~45 GPU-h remaining in any shape); nothing resubmitted.

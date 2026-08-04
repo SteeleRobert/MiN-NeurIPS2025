@@ -341,7 +341,8 @@ def main():
         rec.log({'phase': 'stage_end', 'stage': i, 'task_accs': history[-1]})
 
     rec.log({'phase': 'final', 'history': history})
-    print('PROBE_FINAL: ' + json.dumps(history))
+    print('PROBE_FINAL: ' + json.dumps(
+        [{str(k): float(v) for k, v in h.items()} for h in history]))
 
 
 if __name__ == '__main__':

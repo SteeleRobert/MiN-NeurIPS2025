@@ -62,13 +62,24 @@ class ProbeRecorder(object):
         self.probes = {}            # probe_name -> (loader, class_list_orders)
         self.phase_ctr = 0
         # reference copy of trainable backbone params (LayerNorms etc.) at t=0
-        self.init_params = {n: p.detach().clone()
+        self.init_params = {n: p.detach().cpu().clone()
                             for n, p in self.net.named_parameters()
                             if 'norm' in n and 'noise_maker' not in n} if measure else {}
 
     def log(self, rec):
         rec['t'] = time.time()
-        self.out.write(json.dumps(rec) + '\n')
+
+        def san(o):
+            if isinstance(o, dict):
+                return {str(k): san(v) for k, v in o.items()}
+            if isinstance(o, (list, tuple)):
+                return [san(v) for v in o]
+            if isinstance(o, (np.integer,)):
+                return int(o)
+            if isinstance(o, (np.floating,)):
+                return float(o)
+            return o
+        self.out.write(json.dumps(san(rec), default=str) + '\n')
         self.out.flush()
 
     # ---- probe construction (called between stages, no global RNG use) ----
@@ -102,6 +113,9 @@ class ProbeRecorder(object):
         self.phase_ctr += 1
         net = self.net
         net.eval()
+        # MiN's own phase methods each call _network.to(device); mirror that so
+        # a pre-train snapshot doesn't hit a partially-CPU model.
+        net.to(self.device)
         rec = {'phase': phase, 'phase_i': self.phase_ctr, 'cur_task': self.model.cur_task}
 
         # W / R stats
@@ -127,7 +141,7 @@ class ProbeRecorder(object):
             for n, p in net.named_parameters():
                 if n in self.init_params:
                     ref = self.init_params[n]
-                    d2 += float((p.detach() - ref).norm())**2
+                    d2 += float((p.detach().cpu() - ref).norm())**2
                     n2 += float(ref.norm())**2
             rec['ln_drift_rel'] = (d2**0.5) / max(n2**0.5, 1e-9)
 
@@ -216,7 +230,9 @@ def install_grad_recorder(rec):
     def wrapped_go(*a, **kw):
         opt = orig_go(*a, **kw)
         orig_step = opt.step
-        def step(*sa, **skw):
+        # must be a bound method: torch's LRScheduler wraps opt.step and
+        # reads .__func__, which plain closures lack
+        def step(_self, *sa, **skw):
             if rec.measure:
                 g2 = {}
                 mx = {}
@@ -232,7 +248,7 @@ def install_grad_recorder(rec):
                          'gnorm': {k: round(v**0.5, 6) for k, v in g2.items()},
                          'gmax': {k: round(v, 6) for k, v in mx.items()}})
             return orig_step(*sa, **skw)
-        opt.step = step
+        opt.step = types.MethodType(step, opt)
         return opt
     MiNmod.get_optimizer = wrapped_go
 
@@ -300,10 +316,12 @@ def main():
              'seed': opts.seed, 'stages': opts.stages,
              'class_order': list(map(int, datamanger.class_order)),
              'measure': opts.measure})
+    # NOTE: no pre-train snapshot — PiNoise.forward crashes before the first
+    # update_noise() (empty mu list -> None @ w_up), so a forward pass cannot
+    # precede init_train. LN drift references are taken at construction above.
     if opts.measure:
         rec.add_probe('t0_train', 0)
         rec.add_test_probe('t0_test', 0)
-        rec.snapshot('pre_train')
     install_wrappers(model, rec)
     install_grad_recorder(rec)
 
